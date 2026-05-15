@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P.O.A.S.T. — Follow The Dark Money</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=IBM+Plex+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #050505;
+  --paper: #0c0c0a;
+  --panel: #101010;
+  --border: #1c1c1c;
+  --wire: #2a2a2a;
+  --off-white: #e8e3d5;
+  --dim: #666;
+  --gold: #c8a84b;
+  --gold-dim: #6a5520;
+  --gold-glow: rgba(200,168,75,0.15);
+  --red: #bf3a2b;
+  --red-dim: #4a1510;
+  --red-bright: #e84535;
+  --green: #1a8a5a;
+  --green-dim: #0a3a22;
+  --blue: #2e6db4;
+  --blue-dim: #152d4a;
+  --purple: #7c3aed;
+  --purple-dim: #3b1a70;
+  --orange: #c2621a;
+  --orange-dim: #5a2a08;
+  --mono: 'IBM Plex Mono', monospace;
+  --courier: 'Courier Prime', 'Courier New', monospace;
+  --display: 'Bebas Neue', sans-serif;
+}
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--off-white);
+  font-family:var(--mono);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* GRAIN */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:9999;opacity:0.6;
+}
+
+/* MASTHEAD */
+.mast{
+  padding:0.8rem 1.5rem;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--bg);position:sticky;top:0;z-index:200;
+}
+.logo{font-family:var(--display);font-size:1.9rem;letter-spacing:0.15em;color:var(--gold);text-shadow:0 0 20px rgba(200,168,75,0.2);}
+.logo-sub{font-size:0.48rem;color:var(--gold-dim);letter-spacing:0.22em;text-transform:uppercase;}
+.mast-badge{font-size:0.5rem;letter-spacing:0.18em;text-transform:uppercase;padding:0.28rem 0.7rem;border:1px solid var(--red-dim);color:var(--red-bright);}
+
+/* HERO */
+.hero{padding:2.5rem 1.5rem 1.5rem;border-bottom:1px solid var(--border);position:relative;overflow:hidden;}
+.hero::after{
+  content:'$$$';position:absolute;right:-1rem;top:50%;transform:translateY(-50%);
+  font-family:var(--display);font-size:clamp(6rem,18vw,14rem);
+  color:rgba(200,168,75,0.03);letter-spacing:0.2em;pointer-events:none;
+}
+.hero-eye{font-size:0.58rem;letter-spacing:0.28em;text-transform:uppercase;color:var(--red);margin-bottom:0.8rem;}
+.hero h1{font-family:var(--display);font-size:clamp(2.5rem,7vw,6rem);line-height:0.88;letter-spacing:0.04em;color:var(--off-white);max-width:760px;}
+.hero h1 em{color:var(--gold);font-style:normal;display:block;}
+.hero-deck{font-family:var(--courier);font-size:0.88rem;line-height:1.75;color:var(--dim);max-width:620px;margin-top:1.2rem;}
+.hero-deck strong{color:var(--off-white);}
+
+/* LEGEND */
+.legend{
+  display:flex;gap:1rem;flex-wrap:wrap;
+  padding:0.8rem 1.5rem;border-bottom:1px solid var(--border);
+  background:var(--paper);
+}
+.leg-item{display:flex;align-items:center;gap:0.4rem;font-size:0.48rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);}
+.leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.leg-line{width:24px;height:2px;flex-shrink:0;}
+
+/* MAP CONTAINER */
+.map-wrap{padding:1.5rem;overflow-x:auto;}
+.map-svg-wrap{position:relative;min-width:900px;width:100%;}
+
+/* NODE STYLES */
+.node{cursor:pointer;}
+.node rect,.node ellipse{transition:filter 0.2s,opacity 0.2s;}
+.node:hover rect,.node:hover ellipse{filter:brightness(1.25);}
+.node text{pointer-events:none;font-family:var(--mono);fill:var(--off-white);}
+
+/* FLOW LINES */
+.flow-line{stroke-dasharray:6 4;animation:dash 1.5s linear infinite;}
+.flow-solid{stroke-dasharray:none;}
+@keyframes dash{to{stroke-dashoffset:-20;}}
+
+/* TOOLTIP */
+.tip{
+  position:fixed;z-index:300;
+  background:var(--panel);border:1px solid var(--border-lit, #333);
+  padding:1rem 1.2rem;max-width:320px;
+  box-shadow:0 8px 40px rgba(0,0,0,0.8);
+  pointer-events:none;opacity:0;transition:opacity 0.18s;
+  font-size:0.72rem;line-height:1.6;
+}
+.tip.show{opacity:1;}
+.tip-name{font-family:var(--display);font-size:1.3rem;letter-spacing:0.06em;margin-bottom:0.3rem;}
+.tip-type{font-size:0.46rem;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.6rem;}
+.tip-body{font-family:var(--courier);font-size:0.78rem;line-height:1.65;color:#bbb;}
+.tip-body strong{color:var(--gold);}
+.tip-src{font-size:0.48rem;letter-spacing:0.1em;color:var(--gold-dim);margin-top:0.6rem;border-top:1px solid #222;padding-top:0.5rem;}
+
+/* FINDINGS SECTION */
+.findings{border-top:1px solid var(--border);}
+.findings-hd{padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);background:var(--paper);}
+.findings-title{font-family:var(--display);font-size:1.8rem;letter-spacing:0.08em;color:var(--off-white);}
+.findings-sub{font-size:0.5rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--dim);margin-top:0.2rem;}
+
+.layer{border-bottom:1px solid var(--border);}
+.layer-hd{
+  padding:1rem 1.5rem;display:flex;align-items:center;gap:1rem;
+  cursor:pointer;transition:background 0.18s;
+  border-left:4px solid transparent;
+}
+.layer-hd:hover{background:rgba(255,255,255,0.015);}
+.layer-num{font-family:var(--display);font-size:2.5rem;color:var(--border);line-height:1;min-width:2.5rem;}
+.layer-meta{flex:1;}
+.layer-cat{font-size:0.48rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--dim);margin-bottom:0.12rem;}
+.layer-title{font-family:var(--display);font-size:clamp(1rem,2.5vw,1.7rem);letter-spacing:0.06em;line-height:1;}
+.layer-toggle{font-size:0.6rem;color:var(--dim);transition:transform 0.2s;}
+.layer-body{display:none;padding:0 1.5rem 1.5rem;}
+.layer-body.open{display:block;}
+.layer-toggle.open{transform:rotate(180deg);}
+
+/* LAYER COLORS */
+.layer:nth-child(1) .layer-hd{border-left-color:var(--blue);}
+.layer:nth-child(1) .layer-title{color:var(--blue);}
+.layer:nth-child(2) .layer-hd{border-left-color:var(--purple);}
+.layer:nth-child(2) .layer-title{color:var(--purple);}
+.layer:nth-child(3) .layer-hd{border-left-color:var(--orange);}
+.layer:nth-child(3) .layer-title{color:var(--orange);}
+.layer:nth-child(4) .layer-hd{border-left-color:var(--gold);}
+.layer:nth-child(4) .layer-title{color:var(--gold);}
+.layer:nth-child(5) .layer-hd{border-left-color:var(--red);}
+.layer:nth-child(5) .layer-title{color:var(--red-bright);}
+
+.finding-row{
+  display:grid;grid-template-columns:1fr 140px;gap:1rem;
+  padding:0.9rem 0;border-bottom:1px solid #111;align-items:start;
+}
+.finding-row:last-child{border-bottom:none;}
+.ftag{display:inline-block;font-size:0.44rem;letter-spacing:0.16em;text-transform:uppercase;padding:0.1rem 0.35rem;border:1px solid;margin-bottom:0.45rem;}
+.ftag.verified{color:var(--green);border-color:var(--green-dim);}
+.ftag.probable{color:var(--gold);border-color:var(--gold-dim);}
+.ftag.gap{color:var(--dim);border-color:var(--border);}
+.ftext{font-family:var(--courier);font-size:0.84rem;line-height:1.72;color:#ccc;}
+.ftext strong{color:var(--off-white);}
+.ftext em{color:var(--red-bright);font-style:italic;}
+.fsrc{display:flex;flex-direction:column;gap:0.3rem;align-items:flex-end;}
+.sbadge{font-size:0.44rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--dim);background:var(--paper);border:1px solid var(--border);padding:0.15rem 0.35rem;text-align:right;word-break:break-word;}
+
+/* KAYFABE CLOSE */
+.kf-close{padding:2rem 1.5rem;background:linear-gradient(135deg,rgba(191,58,43,0.07) 0%,transparent 100%);border-left:4px solid var(--red-dim);}
+.kf-label{font-size:0.52rem;letter-spacing:0.28em;text-transform:uppercase;color:var(--red);margin-bottom:0.7rem;}
+.kf-text{font-family:var(--courier);font-size:0.95rem;line-height:1.85;color:var(--off-white);max-width:740px;}
+.kf-text strong{color:var(--red-bright);}
+.kf-text .gold{color:var(--gold);}
+
+/* FOOTER */
+.footer{padding:1.5rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+.footer-logo{font-family:var(--display);font-size:3rem;color:var(--gold);letter-spacing:0.3em;text-shadow:0 0 30px rgba(200,168,75,0.15);}
+.footer-r{text-align:right;}
+.footer-line{font-size:0.5rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--dim);line-height:2;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.layer{animation:fadeUp 0.5s ease both;animation-delay:calc(var(--i,0)*0.07s);}
+</style>
+</head>
+<body>
+
+<!-- MASTHEAD -->
+<header class="mast">
+  <div><div class="logo">P.O.A.S.T.</div><div class="logo-sub">Investigative Canvas — Dark Money Trail</div></div>
+  <div class="mast-badge">Follow The Dark Money // May 2026</div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eye">▶ Dark Money Infrastructure Map</div>
+  <h1>WHO FUNDS<em>THE MACHINE</em></h1>
+  <p class="hero-deck">
+    From <strong>anonymous billionaire donors</strong> through <strong>donor-advised funds</strong> into <strong>nonprofit litigation shops</strong> into <strong>government policy</strong> — this is how money moves without leaving fingerprints. Every node on this map has been sourced to IRS Form 990 filings, court records, FEC disclosures, or named investigative reporting. <strong>Click any node for details.</strong>
+  </p>
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="leg-item"><div class="leg-dot" style="background:var(--blue)"></div>Anonymous Donors / Billionaires</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--purple)"></div>DAF / Dark Money Conduit</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--orange)"></div>501(c)(4) Pass-Through</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--gold)"></div>501(c)(3) Litigation / Nonprofit</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--red)"></div>Government / Policy Outcome</div>
+  <div class="leg-item"><div class="leg-line" style="background:var(--gold);opacity:0.7"></div>Confirmed cash flow (990)</div>
+  <div class="leg-item"><div class="leg-line" style="background:var(--dim);border-top:2px dashed var(--dim)"></div>Probable / Structural connection</div>
+</div>
+
+<!-- SVG MAP -->
+<div class="map-wrap">
+<div class="map-svg-wrap">
+<svg id="mapSvg" viewBox="0 0 1000 620" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block;">
+  <defs>
+    <marker id="arr-gold" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#c8a84b" opacity="0.7"/>
+    </marker>
+    <marker id="arr-dim" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#444"/>
+    </marker>
+    <marker id="arr-red" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#bf3a2b" opacity="0.8"/>
+    </marker>
+    <filter id="glow-gold"><feGaussianBlur stdDeviation="3" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <filter id="glow-red"><feGaussianBlur stdDeviation="4" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>
+
+  <!-- BACKGROUND GRID -->
+  <rect width="1000" height="620" fill="#080808"/>
+  <g opacity="0.04" stroke="#c8a84b" stroke-width="0.5">
+    <line x1="0" y1="124" x2="1000" y2="124"/>
+    <line x1="0" y1="248" x2="1000" y2="248"/>
+    <line x1="0" y1="372" x2="1000" y2="372"/>
+    <line x1="0" y1="496" x2="1000" y2="496"/>
+    <line x1="200" y1="0" x2="200" y2="620"/>
+    <line x1="400" y1="0" x2="400" y2="620"/>
+    <line x1="600" y1="0" x2="600" y2="620"/>
+    <line x1="800" y1="0" x2="800" y2="620"/>
+  </g>
+
+  <!-- LAYER LABELS -->
+  <text x="10" y="75" font-family="'IBM Plex Mono'" font-size="9" fill="#333" letter-spacing="2">LAYER 1 — ANONYMOUS DONORS</text>
+  <text x="10" y="195" font-family="'IBM Plex Mono'" font-size="9" fill="#333" letter-spacing="2">LAYER 2 — DARK MONEY CONDUIT</text>
+  <text x="10" y="315" font-family="'IBM Plex Mono'" font-size="9" fill="#333" letter-spacing="2">LAYER 3 — LITIGATION NONPROFITS</text>
+  <text x="10" y="435" font-family="'IBM Plex Mono'" font-size="9" fill="#333" letter-spacing="2">LAYER 4 — OPERATIONAL ENTITIES</text>
+  <text x="10" y="545" font-family="'IBM Plex Mono'" font-size="9" fill="#333" letter-spacing="2">LAYER 5 — GOVERNMENT / POLICY OUTCOMES</text>
+
+  <!-- ══════ LAYER 1 NODES — ANONYMOUS DONORS ══════ -->
+
+  <!-- Koch Network -->
+  <g class="node" onclick="showTip(event,'KOCH NETWORK','Anonymous Donors / Billionaires','Charles Koch and associated billionaire donors. Routed hundreds of millions through Freedom Partners, TC4 Trust, and Center to Protect Patient Rights before those vehicles were exposed. Now primarily routes through DonorsTrust. <strong>$500M+ raised by DonorsTrust</strong> since 1999 from Koch-aligned sources.','OpenSecrets, Issue One, IRS 990s')">
+    <rect x="60" y="30" width="150" height="42" rx="2" fill="none" stroke="#2e6db4" stroke-width="1.5" opacity="0.8"/>
+    <rect x="61" y="31" width="148" height="40" rx="1" fill="rgba(46,109,180,0.08)"/>
+    <text x="135" y="47" text-anchor="middle" font-family="'Bebas Neue'" font-size="13" fill="#5a9fd4" letter-spacing="1">KOCH NETWORK</text>
+    <text x="135" y="62" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7.5" fill="#3a6898">Anonymous / Billionaires</text>
+  </g>
+
+  <!-- Leonard Leo -->
+  <g class="node" onclick="showTip(event,'LEONARD LEO','Anonymous Donor Network — Federalist Society','Leo controls the Marble Freedom Trust, which disclosed sending DonorsTrust $41.1M on its 2020 IRS filing. Mentor to Consumers Research CEO Will Hild. <strong>Leo's network raised $1.6B for conservative causes</strong> between 2021–2022. Connected to Heritage Foundation, 85 Fund, Concord Fund.','Washington Post, OpenSecrets IRS 990 2020')">
+    <rect x="240" y="30" width="150" height="42" rx="2" fill="none" stroke="#2e6db4" stroke-width="1.5" opacity="0.8"/>
+    <rect x="241" y="31" width="148" height="40" rx="1" fill="rgba(46,109,180,0.08)"/>
+    <text x="315" y="47" text-anchor="middle" font-family="'Bebas Neue'" font-size="13" fill="#5a9fd4" letter-spacing="1">LEONARD LEO</text>
+    <text x="315" y="62" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7.5" fill="#3a6898">Marble Freedom Trust</text>
+  </g>
+
+  <!-- GEO / CoreCivic donors -->
+  <g class="node" onclick="showTip(event,'GEO GROUP / CORECIVIC EXECUTIVES','Private Prison Corporate Donors','George Zoley (GEO Group) and Damon Hininger (CoreCivic) donated $1M+ to Republican PACs and the RNC combined. GEO and CoreCivic PACs donated $500K+ to Republican members and $57K to Democrats. Also routed money through CBCI honorary expense payments ($25K each in 2018 and 2019 to the CBC Institute).','OpenSecrets Apr 2025, The Appeal Feb 2026, FEC records')">
+    <rect x="420" y="30" width="170" height="42" rx="2" fill="none" stroke="#2e6db4" stroke-width="1.5" opacity="0.8"/>
+    <rect x="421" y="31" width="168" height="40" rx="1" fill="rgba(46,109,180,0.08)"/>
+    <text x="505" y="47" text-anchor="middle" font-family="'Bebas Neue'" font-size="12" fill="#5a9fd4" letter-spacing="1">GEO / CORECIVIC EXECS</text>
+    <text x="505" y="62" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7.5" fill="#3a6898">Corporate PAC + CBCI donations</text>
+  </g>
+
+  <!-- Todd Ricketts -->
+  <g class="node" onclick="showTip(event,'TODD RICKETTS','Chicago Cubs Co-Owner / Republican Donor','Politico reported Stephen Miller <strong>personally requested funding from Todd Ricketts</strong> when forming America First Legal in 2021. Ricketts family are major Republican mega-donors — contributed $150M+ to Republican causes. No publicly confirmed direct payment to CASA specifically.','Politico Mar 2021, FEC records')">
+    <rect x="620" y="30" width="150" height="42" rx="2" fill="none" stroke="#2e6db4" stroke-width="1.5" opacity="0.8"/>
+    <rect x="621" y="31" width="148" height="40" rx="1" fill="rgba(46,109,180,0.08)"/>
+    <text x="695" y="47" text-anchor="middle" font-family="'Bebas Neue'" font-size="13" fill="#5a9fd4" letter-spacing="1">TODD RICKETTS</text>
+    <text x="695" y="62" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7.5" fill="#3a6898">Cubs Owner / GOP Mega-Donor</text>
+  </g>
+
+  <!-- Nathan Albers / Mar-a-Lago -->
+  <g class="node" onclick="showTip(event,'NATHAN ALBERS','Camp East Montana Contractor / Mar-a-Lago Donor','$339,218 in Republican campaign donations pre-2026 election per FEC. Election night 2024 at Mar-a-Lago. Golf fundraiser with Eric Trump. Attended Crypto Ball. Routes money directly to Republican candidates and PACs — not through nonprofits, so fully visible in FEC records.','FEC records, ProPublica Jul 2025')">
+    <rect x="800" y="30" width="150" height="42" rx="2" fill="none" stroke="#2e6db4" stroke-width="1.5" opacity="0.8"/>
+    <rect x="801" y="31" width="148" height="40" rx="1" fill="rgba(46,109,180,0.08)"/>
+    <text x="875" y="47" text-anchor="middle" font-family="'Bebas Neue'" font-size="13" fill="#5a9fd4" letter-spacing="1">NATHAN ALBERS</text>
+    <text x="875" y="62" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7.5" fill="#3a6898">$339K GOP donations / FEC visible</text>
+  </g>
+
+  <!-- ══════ LAYER 2 — DONORS TRUST ══════ -->
+
+  <!-- DonorsTrust -->
+  <g class="node" onclick="showTip(event,'DONORS TRUST','Donor-Advised Fund — Dark Money ATM','Called the &quot;Dark Money ATM of the conservative movement.&quot; $1.36B in net assets end of 2024. Gave $284.1M in grants in 2024 alone — second-biggest year since founding in 1999. <strong>Donors can remain completely anonymous</strong> — the DAF is the donor of record. In 2024 gave: AFL $21.3M, America First Policy Institute $4.4M, State Policy Network $9.8M+, RealClearFoundation $4.4M, Daily Caller News Foundation $1.8M, Epoch Times $26K. Eight unnamed individuals gave $162.4M in 2024.','NOTUS Nov 2025, CMD Nov 2025, OpenSecrets IRS 990')">
+    <ellipse cx="300" cy="170" rx="120" ry="32" fill="none" stroke="#7c3aed" stroke-width="2"/>
+    <ellipse cx="300" cy="170" rx="118" ry="30" fill="rgba(124,58,237,0.1)"/>
+    <text x="300" y="165" text-anchor="middle" font-family="'Bebas Neue'" font-size="15" fill="#a855f7" letter-spacing="1">DONORS TRUST</text>
+    <text x="300" y="181" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7.5" fill="#6d28d9">$1.36B assets // Dark Money ATM</text>
+  </g>
+
+  <!-- Bradley Impact Fund -->
+  <g class="node" onclick="showTip(event,'BRADLEY IMPACT FUND','Milwaukee-Based Conservative Foundation','Funneled a total of <strong>$27.1M into America First Legal</strong> (AFL) per Center for Media and Democracy Dec 2023 report. Part of Lynde and Harry Bradley Foundation network — one of the oldest and largest conservative philanthropic institutions. Total assets over $1B. Routed through Bradley Impact Fund donor-advised vehicle to preserve anonymity.','CMD Dec 2023, Bradley Foundation 990s')">
+    <ellipse cx="600" cy="170" rx="120" ry="32" fill="none" stroke="#7c3aed" stroke-width="2"/>
+    <ellipse cx="600" cy="170" rx="118" ry="30" fill="rgba(124,58,237,0.1)"/>
+    <text x="600" y="165" text-anchor="middle" font-family="'Bebas Neue'" font-size="14" fill="#a855f7" letter-spacing="1">BRADLEY IMPACT FUND</text>
+    <text x="600" y="181" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7.5" fill="#6d28d9">$27.1M to AFL confirmed</text>
+  </g>
+
+  <!-- ══════ LAYER 3 — LITIGATION NONPROFITS ══════ -->
+
+  <!-- America First Legal -->
+  <g class="node" onclick="showTip(event,'AMERICA FIRST LEGAL FOUNDATION','501(c)(3) — Founded by Stephen Miller, 2021','Founded April 2021 by Stephen Miller (now White House senior advisor). VP: Gene Hamilton (DOJ official under Trump). Exec Dir: Matthew Whitaker (former Acting AG). Board: Mark Meadows (former Chief of Staff), Russ Vought (OMB Director). Received <strong>$21.3M from DonorsTrust in 2024</strong> alone, up from $3.2M in 2023. <strong>$27.1M from Bradley Impact Fund total.</strong> Filed 20+ lawsuits in 2024 including DEI challenges, voting rights restrictions, election monitoring. Uses identical FOIA warfare tactics as CASA.','NOTUS Nov 2025, SourceWatch, IRS Form 990 2024')">
+    <rect x="140" y="265" width="180" height="52" rx="2" fill="none" stroke="#c2621a" stroke-width="1.5"/>
+    <rect x="141" y="266" width="178" height="50" rx="1" fill="rgba(194,98,26,0.1)"/>
+    <text x="230" y="284" text-anchor="middle" font-family="'Bebas Neue'" font-size="13" fill="#e87e30" letter-spacing="1">AMERICA FIRST LEGAL</text>
+    <text x="230" y="298" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7" fill="#a05520">501(c)(3) // Stephen Miller</text>
+    <text x="230" y="310" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7" fill="#a05520">$21.3M from DonorsTrust 2024</text>
+  </g>
+
+  <!-- CASA -->
+  <g class="node" onclick="showTip(event,'CENTER TO ADVANCE SECURITY IN AMERICA (CASA)','501(c)(3) — Founded by James Fitzpatrick','Dir. Research: <strong>Curtis Schube</strong> — came directly from Dhillon Law Group. Dir: James Fitzpatrick — former Senate aide, Army JAG officer. Presents as nonpartisan. Every FOIA target is a progressive organization. Every exclusive goes to Fox News, Epoch Times, Townhall. Filed FOIA lawsuit Sept 30 2025 against VA/DOJ — represented by Dhillon Law Group (Case No. 1:25-cv-03970). VA terminated ICE medical billing Oct 3. Donors unknown — Schedule B redacted from public 990. Schube on record attacking Open Philanthropy progressive donors in Fox News piece.','Popular Information, Case 1:25-cv-03970, Fox News Feb 2026')">
+    <rect x="380" y="265" width="180" height="52" rx="2" fill="none" stroke="#c2621a" stroke-width="1.5"/>
+    <rect x="381" y="266" width="178" height="50" rx="1" fill="rgba(194,98,26,0.1)"/>
+    <text x="470" y="284" text-anchor="middle" font-family="'Bebas Neue'" font-size="13" fill="#e87e30" letter-spacing="1">CASA</text>
+    <text x="470" y="298" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7" fill="#a05520">501(c)(3) // James Fitzpatrick</text>
+    <text x="470" y="310" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7" fill="#a05520">Donors: DARK // Schube ← Dhillon Law</text>
+  </g>
+
+  <!-- Dhillon Law Group -->
+  <g class="node" onclick="showTip(event,'DHILLON LAW GROUP','Private Law Firm — Harmeet Dhillon','Founded 2006 by Harmeet Dhillon. <strong>Curtis Schube worked here before joining CASA.</strong> Dhillon Law Group is listed as CASA's legal counsel in Case No. 1:25-cv-03970. Dhillon confirmed as Assistant AG for Civil Rights April 3 2025. Her division blocked the investigation into Renée Good. The same law firm that seeded CASA with its research director is the legal counsel for the nonprofit that collapsed ICE medical billing — and its principal now runs the civil rights apparatus that declined to investigate federal killings.','Case 1:25-cv-03970, DOJ confirmation record')">
+    <rect x="620" y="265" width="180" height="52" rx="2" fill="none" stroke="#c2621a" stroke-width="1.5"/>
+    <rect x="621" y="266" width="178" height="50" rx="1" fill="rgba(194,98,26,0.1)"/>
+    <text x="710" y="284" text-anchor="middle" font-family="'Bebas Neue'" font-size="13" fill="#e87e30" letter-spacing="1">DHILLON LAW GROUP</text>
+    <text x="710" y="298" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7" fill="#a05520">Harmeet Dhillon — Private Firm</text>
+    <text x="710" y="310" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7" fill="#a05520">Represents CASA in 1:25-cv-03970</text>
+  </g>
+
+  <!-- ══════ LAYER 4 — OPERATIONAL ══════ -->
+
+  <!-- GEO / CoreCivic -->
+  <g class="node" onclick="showTip(event,'GEO GROUP + CORECIVIC','For-Profit Prison Corporations — Primary Beneficiaries','GEO: $636.2M Q2 2025 revenue (+5% YoY). CoreCivic: $538.2M Q2 2025 (+10%). 71% of ICE deaths occur in their facilities. Nearly <strong>90% of ICE detainees held in privately operated facilities</strong> — highest share in history. GEO board includes former ICE head Julie Wood and former ICE official Matthew Albence. 10 of 13 GEO lobbyists in 2024 are former government officials. Both companies lobbied Congress to force banks to keep financing them after JPMorgan and Wells Fargo cut ties.','GEO Q2 2025 earnings, The Appeal Feb 2026, OpenSecrets')">
+    <rect x="100" y="385" width="200" height="52" rx="2" fill="none" stroke="#c8a84b" stroke-width="1.5"/>
+    <rect x="101" y="386" width="198" height="50" rx="1" fill="rgba(200,168,75,0.07)"/>
+    <text x="200" y="404" text-anchor="middle" font-family="'Bebas Neue'" font-size="13" fill="#c8a84b" letter-spacing="1">GEO GROUP + CORECIVIC</text>
+    <text x="200" y="418" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7" fill="#7a6428">$636M + $538M Q2 2025 revenue</text>
+    <text x="200" y="430" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7" fill="#7a6428">71% of ICE deaths in their facilities</text>
+  </g>
+
+  <!-- CBCI -->
+  <g class="node" onclick="showTip(event,'CBC INSTITUTE (CBCI)','Congressional Black Caucus Institute — Captured','CoreCivic and GEO Group lobbyists are <strong>platinum members</strong> of CBCI\'s 21st Century Council. CoreCivic donated $25,000 in honorary expenses to CBCI in 2018 AND 2019. Honorees: Rep. Bennie Thompson (CBCI chair, Homeland Security Committee chair), Rep. Jim Clyburn, Cedric Richmond. Thompson received $21,000 total in private prison donations per The Appeal — more than any other sitting member.','CBCI 2019 Annual Report, House lobbying disclosure, The Appeal Feb 2026')">
+    <rect x="340" y="385" width="200" height="52" rx="2" fill="none" stroke="#c8a84b" stroke-width="1.5"/>
+    <rect x="341" y="386" width="198" height="50" rx="1" fill="rgba(200,168,75,0.07)"/>
+    <text x="440" y="404" text-anchor="middle" font-family="'Bebas Neue'" font-size="13" fill="#c8a84b" letter-spacing="1">CBC INSTITUTE (CBCI)</text>
+    <text x="440" y="418" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7" fill="#7a6428">$25K CoreCivic "honorary expenses" 2018+19</text>
+    <text x="440" y="430" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7" fill="#7a6428">GEO + CCA lobbyists: Platinum Members</text>
+  </g>
+
+  <!-- Acquisition Logistics / DMG -->
+  <g class="node" onclick="showTip(event,'ACQUISITION LOGISTICS / DISASTER MGMT GROUP','Camp East Montana Prime + Subcontractor','Acq. Logistics: suburban VA house, no prior detention experience, $1.3B contract (8,000% larger than prior maximum). DMG (subcontractor): Nathan Albers co-owned TentLogix when it pleaded guilty 2019 to hiring undocumented workers. $16M DOL back wages 2023. Now building largest ICE detention facility in U.S. history. Three deaths. One ruled homicide. Contract terminated March 2026. Replaced by Amentum (no-bid) — 112 federal violations.','Public Citizen Apr 2026, ProPublica Jul 2025, El Paso Matters')">
+    <rect x="580" y="385" width="200" height="52" rx="2" fill="none" stroke="#c8a84b" stroke-width="1.5"/>
+    <rect x="581" y="386" width="198" height="50" rx="1" fill="rgba(200,168,75,0.07)"/>
+    <text x="680" y="404" text-anchor="middle" font-family="'Bebas Neue'" font-size="11" fill="#c8a84b" letter-spacing="1">ACQ. LOGISTICS / DMG</text>
+    <text x="680" y="418" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7" fill="#7a6428">$1.3B contract // 3 deaths // homicide ruled</text>
+    <text x="680" y="430" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7" fill="#7a6428">Albers: $339K GOP donations / Mar-a-Lago</text>
+  </g>
+
+  <!-- ══════ LAYER 5 — OUTCOMES ══════ -->
+
+  <!-- VA Termination / Medical Collapse -->
+  <g class="node" onclick="showTip(event,'VA BILLING TERMINATION — OCT 3 2025','Government Policy Outcome — Trigger Event','CASA lawsuit filed Sept 30. VA terminated 20-year ICE medical billing agreement Oct 3 — <strong>3 days later</strong>. No transition plan. Providers immediately stopped receiving payment authorization. Acentra Health brought in, missed April 30 2026 restart deadline. <strong>Seven months and counting without functioning payment system.</strong> Death rate accelerated to 5x historical average.','Popular Information, Public Citizen Apr 2026')">
+    <rect x="60" y="505" width="180" height="52" rx="2" fill="none" stroke="#bf3a2b" stroke-width="1.5" filter="url(#glow-red)" opacity="0.9"/>
+    <rect x="61" y="506" width="178" height="50" rx="1" fill="rgba(191,58,43,0.12)"/>
+    <text x="150" y="524" text-anchor="middle" font-family="'Bebas Neue'" font-size="12" fill="#e84535" letter-spacing="1">VA BILLING COLLAPSE</text>
+    <text x="150" y="537" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7" fill="#7a2020">Oct 3 2025 // 7 months no payments</text>
+    <text x="150" y="549" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7" fill="#7a2020">5x historical death rate</text>
+  </g>
+
+  <!-- Renee Good / No Investigation -->
+  <g class="node" onclick="showTip(event,'RENÉE GOOD KILLING — NO INVESTIGATION','Government Policy Outcome — Jan 7 2026','U.S. citizen shot 3 times by ICE agent Jonathan Ross in Minneapolis. DHS tweeted conclusion 3 hours after shooting, before investigation. Harmeet Dhillon (Asst. AG — from Dhillon Law Group) blocked Civil Rights Division investigation. Kash Patel directed FBI to frame Good as subject, not victim. <strong>Entire senior leadership of DOJ Civil Rights Criminal Section resigned Jan 13.</strong> 15+ federal prosecutors resigned total. No agent charged.','CBS News, NYT Feb 7 2026, MN AG lawsuit Mar 24 2026')">
+    <rect x="270" y="505" width="200" height="52" rx="2" fill="none" stroke="#bf3a2b" stroke-width="2" filter="url(#glow-red)" opacity="0.9"/>
+    <rect x="271" y="506" width="198" height="50" rx="1" fill="rgba(191,58,43,0.15)"/>
+    <text x="370" y="522" text-anchor="middle" font-family="'Bebas Neue'" font-size="13" fill="#e84535" letter-spacing="1">RENÉE GOOD — NO INVESTIGATION</text>
+    <text x="370" y="536" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7" fill="#7a2020">Dhillon blocks Civil Rights probe</text>
+    <text x="370" y="548" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7" fill="#7a2020">15+ prosecutors resign in protest</text>
+  </g>
+
+  <!-- Private Prison Revenue -->
+  <g class="node" onclick="showTip(event,'PRIVATE PRISON RECORD REVENUE','Policy Outcome — Financial Windfall','GEO Group and CoreCivic post record quarterly earnings while detainees die in their facilities. <strong>71% of ICE detainee deaths occur in their facilities.</strong> Nearly 90% of all ICE detainees held in private facilities — highest in history. $45B approved in One Big Beautiful Bill Act for new detention centers. GEO: 6,000 new beds. CoreCivic: 7,000+ new beds. Dilley facility (opened under Obama 2014) generating $180M annually for CoreCivic.','GEO/CoreCivic Q2 2025 earnings, The Appeal, Brennan Center')">
+    <rect x="500" y="505" width="200" height="52" rx="2" fill="none" stroke="#bf3a2b" stroke-width="1.5" filter="url(#glow-red)" opacity="0.9"/>
+    <rect x="501" y="506" width="198" height="50" rx="1" fill="rgba(191,58,43,0.12)"/>
+    <text x="600" y="522" text-anchor="middle" font-family="'Bebas Neue'" font-size="12" fill="#e84535" letter-spacing="1">PRIVATE PRISON WINDFALL</text>
+    <text x="600" y="536" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7" fill="#7a2020">GEO $636M + CoreCivic $538M Q2 2025</text>
+    <text x="600" y="548" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7" fill="#7a2020">$45B new detention approved</text>
+  </g>
+
+  <!-- DOJ / Policy capture -->
+  <g class="node" onclick="showTip(event,'DOJ CIVIL RIGHTS CAPTURE','Policy Outcome — Institutional Capture','Harmeet Dhillon (Dhillon Law Group → CASA legal counsel → confirmed AAG April 3 2025) now runs the division that would ordinarily investigate: federal officer killings, civil rights violations in detention, and equal protection violations. <strong>The same network that collapsed ICE medical billing now controls the office that would investigate the resulting deaths.</strong> That is not conspiracy. That is institutional design.','DOJ confirmation record, Case 1:25-cv-03970, CBS News Jan 2026')">
+    <rect x="730" y="505" width="200" height="52" rx="2" fill="none" stroke="#bf3a2b" stroke-width="1.5" filter="url(#glow-red)" opacity="0.9"/>
+    <rect x="731" y="506" width="198" height="50" rx="1" fill="rgba(191,58,43,0.12)"/>
+    <text x="830" y="522" text-anchor="middle" font-family="'Bebas Neue'" font-size="12" fill="#e84535" letter-spacing="1">DOJ CIVIL RIGHTS CAPTURE</text>
+    <text x="830" y="536" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7" fill="#7a2020">Dhillon: Law Firm → CASA → DOJ</text>
+    <text x="830" y="548" text-anchor="middle" font-family="'IBM Plex Mono'" font-size="7" fill="#7a2020">Same network // investigates nothing</text>
+  </g>
+
+  <!-- ══════ FLOW LINES ══════ -->
+
+  <!-- L1 → DonorsTrust -->
+  <line x1="135" y1="72" x2="240" y2="140" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arr-dim)" opacity="0.6" class="flow-line"/>
+  <line x1="315" y1="72" x2="300" y2="138" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arr-dim)" opacity="0.6" class="flow-line"/>
+
+  <!-- L1 → Bradley -->
+  <line x1="505" y1="72" x2="560" y2="140" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arr-dim)" opacity="0.6" class="flow-line"/>
+  <line x1="695" y1="72" x2="630" y2="140" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arr-dim)" opacity="0.6" class="flow-line"/>
+
+  <!-- DonorsTrust → AFL -->
+  <line x1="240" y1="185" x2="230" y2="265" stroke="#c2621a" stroke-width="2" marker-end="url(#arr-gold)" opacity="0.8"/>
+  <text x="222" y="230" font-family="'IBM Plex Mono'" font-size="8" fill="#7a4010" transform="rotate(-80,222,230)">$21.3M 2024</text>
+
+  <!-- DonorsTrust → CASA (probable) -->
+  <line x1="340" y1="175" x2="430" y2="265" stroke="#444" stroke-width="1" stroke-dasharray="4 4" marker-end="url(#arr-dim)" opacity="0.5"/>
+  <text x="400" y="225" font-family="'IBM Plex Mono'" font-size="7.5" fill="#444">probable</text>
+
+  <!-- Bradley → AFL -->
+  <line x1="520" y1="185" x2="310" y2="265" stroke="#c2621a" stroke-width="2" marker-end="url(#arr-gold)" opacity="0.7"/>
+  <text x="430" y="220" font-family="'IBM Plex Mono'" font-size="8" fill="#7a4010">$27.1M total</text>
+
+  <!-- Dhillon Law Group → CASA (personnel pipeline) -->
+  <line x1="620" y1="290" x2="560" y2="290" stroke="#e87e30" stroke-width="2" marker-end="url(#arr-gold)" opacity="0.9"/>
+  <text x="580" y="283" font-family="'IBM Plex Mono'" font-size="7.5" fill="#e87e30">Schube →</text>
+
+  <!-- CASA → VA Termination -->
+  <line x1="450" y1="317" x2="200" y2="505" stroke="#bf3a2b" stroke-width="2" marker-end="url(#arr-red)" opacity="0.8"/>
+  <text x="305" y="415" font-family="'IBM Plex Mono'" font-size="8" fill="#bf3a2b" transform="rotate(-60,305,415)">Sept 30 lawsuit</text>
+
+  <!-- Dhillon (DOJ) → Renee Good (no investigation) -->
+  <line x1="710" y1="317" x2="450" y2="505" stroke="#bf3a2b" stroke-width="2" marker-end="url(#arr-red)" opacity="0.8"/>
+  <text x="600" y="420" font-family="'IBM Plex Mono'" font-size="8" fill="#bf3a2b" transform="rotate(-40,600,420)">blocks probe</text>
+
+  <!-- GEO/CoreCivic → Revenue -->
+  <line x1="200" y1="437" x2="550" y2="505" stroke="#c8a84b" stroke-width="1.5" marker-end="url(#arr-gold)" opacity="0.6"/>
+
+  <!-- GEO/CoreCivic → CBCI -->
+  <line x1="300" y1="411" x2="340" y2="411" stroke="#c8a84b" stroke-width="1.5" marker-end="url(#arr-gold)" opacity="0.7"/>
+  <text x="312" y="405" font-family="'IBM Plex Mono'" font-size="7.5" fill="#7a6428">$25K x2</text>
+
+  <!-- Dhillon Law → DOJ capture -->
+  <line x1="710" y1="317" x2="830" y2="505" stroke="#bf3a2b" stroke-width="2" marker-end="url(#arr-red)" opacity="0.7"/>
+
+  <!-- Albers → Contractors node -->
+  <line x1="875" y1="72" x2="720" y2="385" stroke="#c8a84b" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arr-gold)" opacity="0.6" class="flow-line"/>
+
+  <!-- GEO → Private prison windfall -->
+  <line x1="200" y1="437" x2="200" y2="535" stroke="#c8a84b" stroke-width="1" stroke-dasharray="4 4" marker-end="url(#arr-gold)" opacity="0.4"/>
+
+</svg>
+</div>
+</div>
+
+<!-- TOOLTIP -->
+<div class="tip" id="tip">
+  <div class="tip-name" id="tipName"></div>
+  <div class="tip-type" id="tipType"></div>
+  <div class="tip-body" id="tipBody"></div>
+  <div class="tip-src" id="tipSrc"></div>
+</div>
+
+<!-- FINDINGS SECTION -->
+<div class="findings">
+  <div class="findings-hd">
+    <div class="findings-title">LAYER BY LAYER — THE DOCUMENTED TRAIL</div>
+    <div class="findings-sub">// Click each layer to expand — all findings sourced to primary documents</div>
+  </div>
+
+  <!-- LAYER 1 -->
+  <div class="layer" style="--i:0">
+    <div class="layer-hd" onclick="togLayer(this)">
+      <div class="layer-num">01</div>
+      <div class="layer-meta">
+        <div class="layer-cat">// The invisible origin</div>
+        <div class="layer-title">ANONYMOUS DONORS — WHO WRITES THE CHECKS</div>
+      </div>
+      <div class="layer-toggle">▼</div>
+    </div>
+    <div class="layer-body">
+      <div class="finding-row">
+        <div>
+          <div class="ftag verified">Confirmed — IRS 990</div>
+          <div class="ftext"><strong>DonorsTrust disclosed $1.36 billion in net assets at end of 2024.</strong> In 2024, eight unnamed individuals made either eight- or nine-figure contributions totaling $162.4 million. The names of those donors are not legally required to be disclosed — the donor-advised fund structure provides complete legal anonymity. DonorsTrust president Lawson Bader told NOTUS: "the ability to withhold a donor's identity from the grantee is a feature, not a bug."</div>
+        </div>
+        <div class="fsrc">
+          <span class="sbadge">NOTUS Nov 2025</span>
+          <span class="sbadge">DonorsTrust<br>IRS Form 990</span>
+        </div>
+      </div>
+      <div class="finding-row">
+        <div>
+          <div class="ftag verified">Confirmed — IRS Filing</div>
+          <div class="ftext"><strong>Leonard Leo's Marble Freedom Trust</strong> disclosed sending DonorsTrust $41.1 million on its 2020 IRS filing. Leo controls an extensive network including the 85 Fund and Concord Fund — his network raised an estimated $1.6B for conservative causes in 2021–2022 alone. Washington Post described Leo's network as "a $1.6 billion dark money operation."</div>
+        </div>
+        <div class="fsrc">
+          <span class="sbadge">Marble Freedom<br>Trust IRS 990<br>2020</span>
+          <span class="sbadge">Washington Post</span>
+        </div>
+      </div>
+      <div class="finding-row">
+        <div>
+          <div class="ftag verified">Confirmed — FEC</div>
+          <div class="ftext">Nathan Albers donated <strong>$339,218 to Republican candidates</strong> ahead of the 2026 election per FEC records. This money flows directly — not through dark money vehicles — making it the most visible part of the contractor-to-policy pipeline. Albers is listed as CEO of both Disaster Management Group and Base International in FEC filings.</div>
+        </div>
+        <div class="fsrc">
+          <span class="sbadge">FEC records<br>2025–2026</span>
+          <span class="sbadge">ProPublica<br>Jul 2025</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAYER 2 -->
+  <div class="layer" style="--i:1">
+    <div class="layer-hd" onclick="togLayer(this)">
+      <div class="layer-num">02</div>
+      <div class="layer-meta">
+        <div class="layer-cat">// The washing machine</div>
+        <div class="layer-title">DONORS TRUST — THE DARK MONEY ATM</div>
+      </div>
+      <div class="layer-toggle">▼</div>
+    </div>
+    <div class="layer-body">
+      <div class="finding-row">
+        <div>
+          <div class="ftag verified">Confirmed — IRS 990</div>
+          <div class="ftext">In 2024, DonorsTrust gave <strong>America First Legal $21.3 million</strong> — up from $3.2M in 2023. America First Policy Institute received $4.4M. State Policy Network received $9.8M+. RealClearFoundation: $4.4M. Daily Caller News Foundation: $1.8M. Franklin News Foundation: $850K. Epoch Times: $26K. <em>All recipients are organizations that do not disclose their own donors</em> — meaning DonorsTrust launders the money through multiple layers of nonprofits before it reaches media or litigation operations.</div>
+        </div>
+        <div class="fsrc">
+          <span class="sbadge">NOTUS Nov 2025</span>
+          <span class="sbadge">CMD Nov 2025</span>
+          <span class="sbadge">DonorsTrust<br>IRS Form 990<br>2024</span>
+        </div>
+      </div>
+      <div class="finding-row">
+        <div>
+          <div class="ftag verified">Confirmed — CMD Analysis</div>
+          <div class="ftext">The <strong>Bradley Impact Fund funneled a total of $27.1 million into America First Legal</strong> per Center for Media and Democracy's December 2023 report. The Milwaukee-based Bradley Foundation has total assets over $1 billion and is one of the oldest conservative philanthropic institutions in the U.S. Grants routed through the "Impact Fund" DAF vehicle to preserve donor anonymity at both ends of the transaction.</div>
+        </div>
+        <div class="fsrc">
+          <span class="sbadge">CMD Dec 2023</span>
+          <span class="sbadge">Bradley<br>Foundation 990s</span>
+        </div>
+      </div>
+      <div class="finding-row">
+        <div>
+          <div class="ftag gap">Structural Gap — CASA Donors Unknown</div>
+          <div class="ftext">CASA's Schedule B — its donor list — is redacted from its public IRS Form 990 as permitted by law. No reporting organization has identified CASA's funding sources. The structural connection to the broader conservative dark money network is circumstantial but architecturally consistent: same legal infrastructure (Dhillon Law Group), same FOIA warfare tactics, same exclusive media pipeline to Fox News and Epoch Times — both DonorsTrust grantees. <strong>This is the gap that requires a FOIA request to the Virginia AG's charity registration office or an IRS leak.</strong></div>
+        </div>
+        <div class="fsrc">
+          <span class="sbadge">⚠ Schedule B<br>redacted</span>
+          <span class="sbadge">P.O.A.S.T.<br>analysis</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAYER 3 -->
+  <div class="layer" style="--i:2">
+    <div class="layer-hd" onclick="togLayer(this)">
+      <div class="layer-num">03</div>
+      <div class="layer-meta">
+        <div class="layer-cat">// The operational weapons</div>
+        <div class="layer-title">THE LITIGATION NONPROFITS — CASA + AFL + DHILLON</div>
+      </div>
+      <div class="layer-toggle">▼</div>
+    </div>
+    <div class="layer-body">
+      <div class="finding-row">
+        <div>
+          <div class="ftag verified">Confirmed — Court Filing</div>
+          <div class="ftext"><strong>Curtis Schube's personnel pipeline:</strong> Missouri admin/election law → Pennsylvania Family Institute (pro-life) → Fairness Center (anti-union Janus cases) → <strong>Dhillon Law Group</strong> → CASA. Dhillon Law Group is listed as CASA's legal representative in Case No. 1:25-cv-03970 — the same lawsuit that triggered the VA billing termination. The personnel connection and legal representation connection between Dhillon Law Group and CASA are both documented in public records.</div>
+        </div>
+        <div class="fsrc">
+          <span class="sbadge">Case No.<br>1:25-cv-03970</span>
+          <span class="sbadge">CASA website<br>bio records</span>
+        </div>
+      </div>
+      <div class="finding-row">
+        <div>
+          <div class="ftag verified">Confirmed — IRS + Court</div>
+          <div class="ftext">America First Legal and CASA use <strong>identical operational tactics</strong>: FOIA requests targeting progressive organizations, lawsuits challenging DEI and immigration policy, exclusive media placements in Fox News and Epoch Times (both DonorsTrust grantees), and legal challenges coordinated with state AGs. AFL board includes Mark Meadows and Matthew Whitaker — both former Trump White House officials now in private roles. AFL received $21.3M from DonorsTrust in 2024 alone while Miller simultaneously serves as White House senior advisor.</div>
+        </div>
+        <div class="fsrc">
+          <span class="sbadge">SourceWatch</span>
+          <span class="sbadge">AFL IRS Form<br>990 2024</span>
+          <span class="sbadge">NOTUS</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAYER 4 -->
+  <div class="layer" style="--i:3">
+    <div class="layer-hd" onclick="togLayer(this)">
+      <div class="layer-num">04</div>
+      <div class="layer-meta">
+        <div class="layer-cat">// Where the money lands</div>
+        <div class="layer-title">THE BENEFICIARIES — WHO PROFITS FROM THE COLLAPSE</div>
+      </div>
+      <div class="layer-toggle">▼</div>
+    </div>
+    <div class="layer-body">
+      <div class="finding-row">
+        <div>
+          <div class="ftag verified">Confirmed — Annual Reports + 990s</div>
+          <div class="ftext">GEO Group and CoreCivic are the direct financial beneficiaries of the ICE detention expansion. Both companies simultaneously <strong>donate to Republican PACs, place former ICE officials on their boards, seat their lobbyists at the CBCI platinum level, and donate honorary expenses to Democratic oversight committee chairs.</strong> This is not a partisan operation. It is a bipartisan capture operation. The companies cover both sides of the oversight equation — ensuring no administration can meaningfully reform the system.</div>
+        </div>
+        <div class="fsrc">
+          <span class="sbadge">GEO/CoreCivic<br>annual reports</span>
+          <span class="sbadge">CBCI 2019<br>Annual Report</span>
+          <span class="sbadge">OpenSecrets</span>
+        </div>
+      </div>
+      <div class="finding-row">
+        <div>
+          <div class="ftag verified">Confirmed — FEC + ProPublica</div>
+          <div class="ftext">Nathan Albers — whose prior company pleaded guilty to employing undocumented workers — is now <strong>subcontracting the largest ICE detention facility in U.S. history</strong> after donating $339K to Republican campaigns and spending election night at Mar-a-Lago. The $1.3B contract was awarded through an SBA small disadvantaged business set-aside — a program designed to help underserved businesses — to a company with no detention experience, a blank website, and a suburban house address. The procurement mechanism itself was captured.</div>
+        </div>
+        <div class="fsrc">
+          <span class="sbadge">FEC records</span>
+          <span class="sbadge">ProPublica<br>Jul 2025</span>
+          <span class="sbadge">Public Citizen<br>Apr 2026</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAYER 5 -->
+  <div class="layer" style="--i:4">
+    <div class="layer-hd" onclick="togLayer(this)">
+      <div class="layer-num">05</div>
+      <div class="layer-meta">
+        <div class="layer-cat">// The outcomes — what the machine produces</div>
+        <div class="layer-title">POLICY OUTCOMES — DEATHS, COVER-UPS, WINDFALL</div>
+      </div>
+      <div class="layer-body">
+        <div class="finding-row">
+          <div>
+            <div class="ftag verified">Confirmed — Medical Examiner + ICE Data</div>
+            <div class="ftext">The payment collapse chain produces a <strong>documented, measurable body count</strong>: 38+ deaths in ICE custody 2025 through Feb 2026. 71% in for-profit facilities. Death rate 5x historical average since Oct 3 payment stop. One death at Camp East Montana ruled homicide by El Paso County Medical Examiner — ICE called it suicide. The Renée Good killing produced zero federal charges, 15+ federal prosecutor resignations, and a Minnesota state lawsuit to force release of evidence. <em>Every outcome benefits the same set of actors.</em></div>
+          </div>
+          <div class="fsrc">
+            <span class="sbadge">El Paso County<br>Medical Examiner</span>
+            <span class="sbadge">The Appeal<br>Feb 2026</span>
+            <span class="sbadge">NYT Feb 2026</span>
+          </div>
+        </div>
+      </div>
+      <div class="layer-toggle">▼</div>
+    </div>
+    <div class="layer-body">
+    </div>
+  </div>
+</div>
+
+<!-- KAYFABE CLOSE -->
+<div class="kf-close">
+  <div class="kf-label">⬡ P.O.A.S.T. Kayfabe Frame — The Full Circuit</div>
+  <p class="kf-text">
+    <strong>Anonymous billionaires</strong> give to DonorsTrust — no names required. DonorsTrust gives to America First Legal — no names required. AFL uses identical tactics to CASA — FOIA lawsuits, conservative media exclusives, policy outcomes that collapse medical payments and expand detention. <span class="gold">Dhillon Law Group</span> seeds CASA with its own personnel and provides its legal representation. The lawsuit collapses medical billing. <strong>People die.</strong> GEO Group and CoreCivic post record revenue. Their lobbyists sit at the platinum level of the CBC Institute. Their money flows to both Republican PACs and Democratic oversight committee chairs. The Dhillon Law Group principal now runs the DOJ Civil Rights Division and blocks investigation of federal killings. Nathan Albers golfs with Eric Trump, donates $339K, and wins a $1.3B detention contract through a procurement mechanism designed to help underserved businesses.<br><br>
+    Nobody conspired. <strong>The system ran itself.</strong> That is the kayfabe. The fight between red and blue is real — but it is a fight over who gets to manage the machine, not whether the machine runs. The machine always runs. The money always flows. The receipts are in the 990s.
+  </p>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-logo">Shhh.</div>
+  <div class="footer-r">
+    <div class="footer-line">@JimmyHitchcock — P.O.A.S.T.</div>
+    <div class="footer-line">YouTube · Rumble · Podcast</div>
+    <div class="footer-line">All findings: IRS Form 990s, FEC records,</div>
+    <div class="footer-line">court filings, named investigative reporting.</div>
+    <div class="footer-line" style="color:var(--gold-dim);margin-top:0.4rem;">Less Noise. More Movement. The People Are The Power.</div>
+  </div>
+</footer>
+
+<script>
+// TOOLTIP
+const tip = document.getElementById('tip');
+function showTip(e, name, type, body, src) {
+  document.getElementById('tipName').textContent = name;
+  document.getElementById('tipType').textContent = type;
+  document.getElementById('tipBody').innerHTML = body;
+  document.getElementById('tipSrc').textContent = 'Sources: ' + src;
+  tip.classList.add('show');
+  moveTip(e);
+}
+function moveTip(e) {
+  const x = e.clientX, y = e.clientY;
+  const tw = 320, th = 200;
+  const left = x + 15 + tw > window.innerWidth ? x - tw - 15 : x + 15;
+  const top = y + 15 + th > window.innerHeight ? y - th - 15 : y + 15;
+  tip.style.left = left + 'px';
+  tip.style.top = top + 'px';
+}
+document.addEventListener('mousemove', e => { if(tip.classList.contains('show')) moveTip(e); });
+document.addEventListener('click', e => {
+  if(!e.target.closest('.node')) tip.classList.remove('show');
+});
+
+// LAYER TOGGLE
+function togLayer(hd) {
+  const body = hd.nextElementSibling;
+  const tog = hd.querySelector('.layer-toggle');
+  const open = body.classList.contains('open');
+  body.classList.toggle('open', !open);
+  tog.classList.toggle('open', !open);
+  tog.textContent = open ? '▼' : '▲';
+}
+</script>
+</body>
+</html>

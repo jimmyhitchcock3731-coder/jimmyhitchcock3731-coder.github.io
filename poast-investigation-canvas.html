@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P.O.A.S.T. — The Canvas: Follow The Money</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@300;400;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #080808;
+  --dark: #111111;
+  --darker: #0d0d0d;
+  --panel: #141414;
+  --border: #222222;
+  --border-lit: #2a2a2a;
+  --off-white: #e8e3d8;
+  --dim: #888880;
+  --gold: #c8a84b;
+  --gold-dim: #7a6428;
+  --gold-glow: rgba(200,168,75,0.12);
+  --red: #c0392b;
+  --red-dim: #6b1f18;
+  --red-glow: rgba(192,57,43,0.1);
+  --green: #1d8a5a;
+  --green-dim: #0e4a30;
+  --mono: 'IBM Plex Mono', monospace;
+  --serif: 'Libre Baskerville', Georgia, serif;
+  --display: 'Bebas Neue', sans-serif;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--off-white);
+  font-family: var(--mono);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* SCANLINE */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── HEADER ── */
+.masthead {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--black);
+  border-bottom: 1px solid var(--border);
+  padding: 0.8rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.logo-lock {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+.logo {
+  font-family: var(--display);
+  font-size: 2rem;
+  letter-spacing: 0.15em;
+  color: var(--gold);
+  text-shadow: 0 0 30px rgba(200,168,75,0.3);
+  line-height: 1;
+}
+
+.logo-sub {
+  font-size: 0.55rem;
+  color: var(--gold-dim);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+}
+
+.nav-pills {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.pill {
+  font-size: 0.55rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.6rem;
+  border: 1px solid var(--border-lit);
+  color: var(--dim);
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.pill:hover { border-color: var(--gold-dim); color: var(--gold); }
+.pill.active { border-color: var(--gold); color: var(--gold); background: var(--gold-glow); }
+
+/* ── HERO ── */
+.hero {
+  padding: 3.5rem 1.5rem 2rem;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: 'FOLLOW\ATHE\AMONEY';
+  white-space: pre;
+  position: absolute;
+  right: -2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--display);
+  font-size: clamp(5rem, 14vw, 12rem);
+  line-height: 0.85;
+  color: rgba(200,168,75,0.03);
+  letter-spacing: 0.05em;
+  pointer-events: none;
+  text-align: right;
+}
+
+.hero-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.3em;
+  color: var(--red);
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.hero h1 {
+  font-family: var(--display);
+  font-size: clamp(2.5rem, 6vw, 6rem);
+  line-height: 0.9;
+  letter-spacing: 0.05em;
+  color: var(--off-white);
+  max-width: 700px;
+}
+
+.hero h1 em {
+  color: var(--gold);
+  font-style: normal;
+  display: block;
+}
+
+.hero-meta {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.meta-val {
+  font-family: var(--display);
+  font-size: 1.8rem;
+  color: var(--gold);
+  line-height: 1;
+}
+
+.meta-val.red { color: var(--red); }
+
+.meta-key {
+  font-size: 0.52rem;
+  letter-spacing: 0.2em;
+  color: var(--dim);
+  text-transform: uppercase;
+}
+
+/* ── SECTION STRUCTURE ── */
+.section {
+  border-bottom: 1px solid var(--border);
+  animation: fadeUp 0.6s ease both;
+}
+
+.section-header {
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  user-select: none;
+}
+
+.section-header:hover { background: rgba(255,255,255,0.02); }
+
+.section-num {
+  font-family: var(--display);
+  font-size: 3rem;
+  color: var(--border-lit);
+  line-height: 1;
+  min-width: 3rem;
+}
+
+.section-title-block { flex: 1; }
+
+.section-cat {
+  font-size: 0.52rem;
+  letter-spacing: 0.25em;
+  color: var(--dim);
+  text-transform: uppercase;
+  margin-bottom: 0.2rem;
+}
+
+.section-title {
+  font-family: var(--display);
+  font-size: clamp(1.2rem, 3vw, 2rem);
+  letter-spacing: 0.06em;
+  color: var(--off-white);
+  line-height: 1;
+}
+
+.section-toggle {
+  font-size: 0.7rem;
+  color: var(--gold-dim);
+  letter-spacing: 0.1em;
+  transition: transform 0.3s;
+}
+
+.section-toggle.open { transform: rotate(180deg); }
+
+.section-body {
+  display: none;
+}
+
+.section-body.open { display: block; }
+
+/* ── FINDING ROWS ── */
+.finding {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  padding: 1.2rem 1.5rem;
+  border-bottom: 1px solid #191919;
+  align-items: start;
+  transition: background 0.15s;
+}
+
+.finding:hover { background: rgba(255,255,255,0.015); }
+
+.finding:last-child { border-bottom: none; }
+
+.finding-content { }
+
+.finding-tag {
+  font-size: 0.52rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  display: inline-block;
+  padding: 0.15rem 0.4rem;
+  border: 1px solid;
+}
+
+.finding-tag.confirmed { color: var(--green); border-color: var(--green-dim); }
+.finding-tag.critical { color: var(--red); border-color: var(--red-dim); }
+.finding-tag.unverified { color: var(--dim); border-color: var(--border-lit); }
+.finding-tag.kayfabe { color: var(--gold); border-color: var(--gold-dim); }
+
+.finding-text {
+  font-family: var(--serif);
+  font-size: 0.88rem;
+  line-height: 1.75;
+  color: #ccc9be;
+  font-weight: 400;
+}
+
+.finding-text strong { color: var(--gold); font-weight: 700; }
+.finding-text em { color: var(--red); font-style: italic; }
+.finding-text .green { color: var(--green); }
+
+.finding-src {
+  text-align: right;
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.src-badge {
+  font-size: 0.5rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--dim);
+  background: var(--darker);
+  border: 1px solid var(--border);
+  padding: 0.2rem 0.4rem;
+  white-space: nowrap;
+  text-decoration: none;
+  display: block;
+  transition: all 0.2s;
+  max-width: 140px;
+  text-align: right;
+  word-break: break-all;
+  hyphens: auto;
+}
+
+.src-badge:hover {
+  border-color: var(--gold-dim);
+  color: var(--gold);
+}
+
+/* ── STAT STRIP ── */
+.stat-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  border-bottom: 1px solid var(--border);
+  background: var(--darker);
+}
+
+.stat-cell {
+  padding: 1.2rem 1.5rem;
+  border-right: 1px solid var(--border);
+}
+
+.stat-cell:last-child { border-right: none; }
+
+.stat-n {
+  font-family: var(--display);
+  font-size: 2.2rem;
+  line-height: 1;
+  margin-bottom: 0.3rem;
+}
+
+.stat-n.gold { color: var(--gold); text-shadow: 0 0 20px rgba(200,168,75,0.2); }
+.stat-n.red { color: var(--red); text-shadow: 0 0 20px rgba(192,57,43,0.2); }
+.stat-n.green { color: var(--green); }
+
+.stat-d {
+  font-size: 0.5rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--dim);
+  line-height: 1.5;
+}
+
+.stat-s {
+  font-size: 0.48rem;
+  letter-spacing: 0.1em;
+  color: var(--gold-dim);
+  margin-top: 0.4rem;
+}
+
+/* ── TIMELINE ── */
+.timeline {
+  padding: 0;
+}
+
+.t-event {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  border-bottom: 1px solid #161616;
+}
+
+.t-event:last-child { border-bottom: none; }
+
+.t-date {
+  padding: 1rem 1rem 1rem 1.5rem;
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  background: var(--darker);
+}
+
+.t-date-main {
+  font-family: var(--display);
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  color: var(--gold);
+  line-height: 1.2;
+}
+
+.t-date-sub {
+  font-size: 0.48rem;
+  letter-spacing: 0.15em;
+  color: var(--dim);
+  text-transform: uppercase;
+  margin-top: 0.2rem;
+}
+
+.t-content {
+  padding: 1rem 1.5rem;
+}
+
+.t-headline {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--off-white);
+  margin-bottom: 0.4rem;
+}
+
+.t-body {
+  font-family: var(--serif);
+  font-size: 0.82rem;
+  line-height: 1.65;
+  color: #999;
+}
+
+.t-body strong { color: var(--off-white); font-weight: 700; }
+
+.t-flag {
+  display: inline-block;
+  font-size: 0.48rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.12rem 0.35rem;
+  border: 1px solid;
+  margin-top: 0.5rem;
+}
+
+.t-flag.distraction { color: var(--red); border-color: var(--red-dim); }
+.t-flag.signal { color: var(--green); border-color: var(--green-dim); }
+.t-flag.both { color: var(--gold); border-color: var(--gold-dim); }
+
+/* ── ACTOR CARDS ── */
+.actor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1px;
+  background: var(--border);
+}
+
+.actor-card {
+  background: var(--panel);
+  padding: 1.2rem 1.5rem;
+}
+
+.actor-name {
+  font-family: var(--display);
+  font-size: 1.3rem;
+  letter-spacing: 0.08em;
+  color: var(--off-white);
+  line-height: 1.1;
+  margin-bottom: 0.2rem;
+}
+
+.actor-role {
+  font-size: 0.52rem;
+  letter-spacing: 0.18em;
+  color: var(--red);
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+
+.actor-notes {
+  font-family: var(--serif);
+  font-size: 0.8rem;
+  line-height: 1.65;
+  color: #999;
+}
+
+.actor-notes strong { color: var(--gold); font-weight: 700; }
+
+.actor-links {
+  margin-top: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.actor-link {
+  font-size: 0.5rem;
+  letter-spacing: 0.12em;
+  color: var(--gold-dim);
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.actor-link::before { content: '→'; }
+
+/* ── KAYFABE FRAME ── */
+.kayfabe-box {
+  margin: 0;
+  padding: 2rem 1.5rem;
+  background: linear-gradient(135deg, rgba(192,57,43,0.06) 0%, transparent 60%);
+  border-left: 3px solid var(--red-dim);
+}
+
+.kb-label {
+  font-size: 0.55rem;
+  letter-spacing: 0.3em;
+  color: var(--red);
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+
+.kb-text {
+  font-family: var(--serif);
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--off-white);
+  max-width: 700px;
+}
+
+.kb-text strong { color: var(--red); font-weight: 700; }
+
+/* ── FOOTER ── */
+.footer {
+  padding: 2.5rem 1.5rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: gap;
+  gap: 1rem;
+}
+
+.footer-logo {
+  font-family: var(--display);
+  font-size: 3rem;
+  color: var(--gold);
+  letter-spacing: 0.3em;
+  text-shadow: 0 0 40px rgba(200,168,75,0.2);
+}
+
+.footer-right {
+  text-align: right;
+}
+
+.footer-tag {
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  color: var(--dim);
+  text-transform: uppercase;
+  line-height: 2;
+}
+
+/* ── SEARCH BAR ── */
+.search-bar {
+  padding: 0.8rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: var(--darker);
+}
+
+.search-label {
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  color: var(--gold-dim);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border-lit);
+  color: var(--off-white);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  padding: 0.2rem 0;
+  outline: none;
+  letter-spacing: 0.05em;
+}
+
+.search-input::placeholder { color: var(--dim); }
+.search-input:focus { border-bottom-color: var(--gold-dim); }
+
+.search-count {
+  font-size: 0.52rem;
+  letter-spacing: 0.15em;
+  color: var(--dim);
+  white-space: nowrap;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.section { animation-delay: calc(var(--i, 0) * 0.07s); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+  .finding { grid-template-columns: 1fr; }
+  .finding-src { align-items: flex-start; }
+  .t-event { grid-template-columns: 80px 1fr; }
+  .hero-meta { gap: 1rem; }
+  .nav-pills { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- MASTHEAD -->
+<header class="masthead">
+  <div class="logo-lock">
+    <div class="logo">P.O.A.S.T.</div>
+    <div class="logo-sub">Less Noise. More Movement.<br>The People Are The Power.</div>
+  </div>
+  <nav class="nav-pills">
+    <a class="pill active" href="#timeline">Timeline</a>
+    <a class="pill" href="#epstein">Epstein Files</a>
+    <a class="pill" href="#ice">ICE / Detention</a>
+    <a class="pill" href="#crypto">Crypto / WLFI</a>
+    <a class="pill" href="#affinity">Kushner / Affinity</a>
+    <a class="pill" href="#contractors">Contractors</a>
+    <a class="pill" href="#actors">Actors</a>
+    <a class="pill" href="#kayfabe">Kayfabe Frame</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-label">▶ P.O.A.S.T. Investigative Canvas — May 2026</div>
+  <h1>THE CANVAS:<em>FOLLOW THE MONEY</em></h1>
+  <div class="hero-meta">
+    <div class="meta-item">
+      <div class="meta-val">7</div>
+      <div class="meta-key">Investigative<br>threads</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-val">$1.3B</div>
+      <div class="meta-key">Camp East Montana<br>Contract</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-val red">38+</div>
+      <div class="meta-key">Deaths in ICE<br>custody 2025–26</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-val">$6.2B</div>
+      <div class="meta-key">Affinity Partners<br>AUM (2025)</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-val">3M+</div>
+      <div class="meta-key">Epstein pages<br>released</div>
+    </div>
+  </div>
+</div>
+
+<!-- SEARCH -->
+<div class="search-bar">
+  <span class="search-label">// Filter findings</span>
+  <input class="search-input" type="text" id="searchInput" placeholder="Search actors, entities, dates..." oninput="filterFindings()">
+  <span class="search-count" id="searchCount">All findings shown</span>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- SECTION 1 — TIMELINE -->
+<!-- ══════════════════════════════════════ -->
+<div class="section" id="timeline" style="--i:0">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-num">01</div>
+    <div class="section-title-block">
+      <div class="section-cat">// Master chronology</div>
+      <div class="section-title">THE ORCHESTRATED TIMELINE</div>
+    </div>
+    <div class="section-toggle open">▲</div>
+  </div>
+  <div class="section-body open">
+    <div class="timeline">
+
+      <div class="t-event">
+        <div class="t-date">
+          <div class="t-date-main">OCT 3 2025</div>
+          <div class="t-date-sub">Trigger Event</div>
+        </div>
+        <div class="t-content">
+          <div class="t-headline">VA Terminates ICE Medical Billing — Zero Notice</div>
+          <div class="t-body">Three days after CASA's FOIA lawsuit, the VA "abruptly and instantly" terminated its 20-year medical billing agreement with ICE. <strong>Medical payments to outside providers collapse overnight.</strong> Detainees begin being denied treatment. Death rate begins accelerating.</div>
+          <div class="t-flag signal">structural trigger</div>
+        </div>
+      </div>
+
+      <div class="t-event">
+        <div class="t-date">
+          <div class="t-date-main">DEC 19 2025</div>
+          <div class="t-date-sub">Epstein Drop 1</div>
+        </div>
+        <div class="t-content">
+          <div class="t-headline">DOJ Releases First Epstein File Batch — Heavily Redacted</div>
+          <div class="t-body">First wave drops under Epstein Files Transparency Act. Heavily redacted. Same day EU approves €90B Ukraine loan. ICE detention deaths already at record pace. <strong>December 2025 becomes the deadliest month in ICE detention on record.</strong></div>
+          <div class="t-flag both">signal + managed</div>
+        </div>
+      </div>
+
+      <div class="t-event">
+        <div class="t-date">
+          <div class="t-date-main">JAN 7 2026</div>
+          <div class="t-date-sub">Minneapolis</div>
+        </div>
+        <div class="t-content">
+          <div class="t-headline">Renee Good Killed by ICE Agent — U.S. Citizen, Mother of 3</div>
+          <div class="t-body">37-year-old U.S. citizen shot by ICE agent in Minneapolis. Eyewitnesses report federal officers blocked medics from rendering aid. DOJ Civil Rights Division — now under <strong>Harmeet Dhillon</strong> — later declines to investigate the agent. Instead attempts to investigate her widow.</div>
+          <div class="t-flag critical" style="color:var(--red);border-color:var(--red-dim);">critical</div>
+        </div>
+      </div>
+
+      <div class="t-event">
+        <div class="t-date">
+          <div class="t-date-main">JAN 24 2026</div>
+          <div class="t-date-sub">Minneapolis</div>
+        </div>
+        <div class="t-content">
+          <div class="t-headline">Alex Pretti Killed by Border Patrol — ICU Nurse, U.S. Citizen</div>
+          <div class="t-body">37-year-old ICU nurse shot by Border Patrol in Minneapolis. Video evidence contradicts government account. No federal investigation opened. Competing in news cycle with Gaza ceasefire announcement and incoming Epstein dump.</div>
+          <div class="t-flag distraction">buried by news cycle</div>
+        </div>
+      </div>
+
+      <div class="t-event">
+        <div class="t-date">
+          <div class="t-date-main">JAN 30 2026</div>
+          <div class="t-date-sub">Epstein Drop 2</div>
+        </div>
+        <div class="t-content">
+          <div class="t-headline">3 Million Epstein Pages + 180K Images Released</div>
+          <div class="t-body">Largest single document dump in the case. Lands six days after second Minneapolis killing. <strong>The potential accountability story of January — two U.S. citizens killed by federal agents — gets drowned in 3 million pages.</strong> That is the orchestration.</div>
+          <div class="t-flag distraction">flood the zone</div>
+        </div>
+      </div>
+
+      <div class="t-event">
+        <div class="t-date">
+          <div class="t-date-main">FEB 2026</div>
+          <div class="t-date-sub">Escalation</div>
+        </div>
+        <div class="t-content">
+          <div class="t-headline">Operation Epic Fury — U.S.-Israel Strike on Iran Launched</div>
+          <div class="t-body">Iran war dominates all coverage. Strait of Hormuz effectively closed. Oil rerouting to U.S. Gulf Coast ports. Private Geneva trading houses — Vitol, Trafigura, Glencore — positioned for windfall. <strong>ICE deaths, Kushner conflicts, WLFI controversies all buried.</strong></div>
+          <div class="t-flag distraction">total blackout</div>
+        </div>
+      </div>
+
+      <div class="t-event">
+        <div class="t-date">
+          <div class="t-date-main">MAR 12 2026</div>
+          <div class="t-date-sub">Contractor</div>
+        </div>
+        <div class="t-content">
+          <div class="t-headline">Acquisition Logistics LLC Fired — Amentum Gets No-Bid Contract</div>
+          <div class="t-body">DHS terminates Acquisition Logistics after three deaths, 49 detention standard violations, measles outbreak, TB cases. Replaces them with <strong>Amentum — no public bidding — despite Amentum's 112 federal regulatory violations</strong> on record.</div>
+          <div class="t-flag signal">accountability gap</div>
+        </div>
+      </div>
+
+      <div class="t-event">
+        <div class="t-date">
+          <div class="t-date-main">APR 17 2026</div>
+          <div class="t-date-sub">Kushner Probe</div>
+        </div>
+        <div class="t-content">
+          <div class="t-headline">Rep. Raskin Files House Judiciary Letter on Affinity Partners</div>
+          <div class="t-body">Raskin documents Kushner soliciting Gulf sovereign wealth while simultaneously leading Iran negotiations. Affinity assets now $6.2B — 99% foreign-funded. <strong>Almost zero sustained news coverage</strong> — Iran war still consuming oxygen.</div>
+          <div class="t-flag distraction">buried</div>
+        </div>
+      </div>
+
+      <div class="t-event">
+        <div class="t-date">
+          <div class="t-date-main">MAY 8 2026</div>
+          <div class="t-date-sub">UFO Drop</div>
+        </div>
+        <div class="t-content">
+          <div class="t-headline">Pentagon UFO Files Released — Modeled on Epstein Template</div>
+          <div class="t-body">Pentagon drops decades of UFO files at war.gov/UFO. Defense Sec. Hegseth and DNI Gabbard frame it as transparency. Expert review: underwhelming, nothing revelatory. <strong>Structure deliberately mirrors Epstein file release model.</strong> Lands while Iran conflict active, Kushner probe open, Epstein files unprocessed.</div>
+          <div class="t-flag distraction">same playbook</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- SECTION 2 — EPSTEIN FILES -->
+<!-- ══════════════════════════════════════ -->
+<div class="section" id="epstein" style="--i:1">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-num">02</div>
+    <div class="section-title-block">
+      <div class="section-cat">// Document release analysis</div>
+      <div class="section-title">EPSTEIN FILES — THE MANAGED RELEASE</div>
+    </div>
+    <div class="section-toggle">▼</div>
+  </div>
+  <div class="section-body">
+    <div class="stat-strip">
+      <div class="stat-cell"><div class="stat-n gold">3M+</div><div class="stat-d">Pages released<br>Jan 30 2026</div><div class="stat-s">// DOJ Transparency Act</div></div>
+      <div class="stat-cell"><div class="stat-n gold">180K</div><div class="stat-d">Images in<br>second drop</div><div class="stat-s">// DOJ release</div></div>
+      <div class="stat-cell"><div class="stat-n red">2K+</div><div class="stat-d">Videos in<br>second drop</div><div class="stat-s">// DOJ release</div></div>
+      <div class="stat-cell"><div class="stat-n red">0</div><div class="stat-d">Client list found<br>per DOJ July 2025</div><div class="stat-s">// DOJ official finding</div></div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-content">
+        <div class="finding-tag confirmed">Confirmed</div>
+        <div class="finding-text">DOJ released first Epstein file batch December 19, 2025 under the Epstein Files Transparency Act. Files were heavily redacted and drew bipartisan criticism. DOJ halted the release citing need for additional review time before the January 30 second drop of 3 million+ pages, 2,000+ videos, and 180,000 images.</div>
+      </div>
+      <div class="finding-src">
+        <span class="src-badge">DOJ Transparency Act</span>
+        <span class="src-badge">Congressional record</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-content">
+        <div class="finding-tag critical">Critical</div>
+        <div class="finding-text">DOJ concluded in July 2025 that <strong>no client list existed</strong> and no credible blackmail evidence was found. The files were structurally defanged before public release — over-redacted, released in waves, with the conclusion pre-framed to limit political accountability before a single page was public.</div>
+      </div>
+      <div class="finding-src">
+        <span class="src-badge">DOJ official finding<br>July 2025</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-content">
+        <div class="finding-tag kayfabe">Kayfabe</div>
+        <div class="finding-text">The January 30 Epstein dump lands <strong>six days after</strong> ICU nurse Alex Pretti is killed by Border Patrol in Minneapolis. Two U.S. citizens killed by federal agents in 23 days. That should be the dominant story of January 2026. Instead it competes with 3 million documents, a Gaza ceasefire, and Iran war buildup. The information becomes public while functionally disappearing.</div>
+      </div>
+      <div class="finding-src">
+        <span class="src-badge">P.O.A.S.T. analysis</span>
+        <span class="src-badge">Reuters Jan 2026</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-content">
+        <div class="finding-tag kayfabe">Kayfabe</div>
+        <div class="finding-text">The UFO/UAP file release on May 8, 2026 uses the <strong>identical structural template</strong> as the Epstein releases — waves, framed as transparency, dropped into an active news storm. The government acknowledged modeling the UFO release infrastructure directly on the Epstein file release setup. One playbook. Repeating.</div>
+      </div>
+      <div class="finding-src">
+        <span class="src-badge">Pentagon / war.gov<br>May 8 2026</span>
+        <span class="src-badge">DNI Gabbard<br>statement</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- SECTION 3 — ICE DETENTION -->
+<!-- ══════════════════════════════════════ -->
+<div class="section" id="ice" style="--i:2">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-num">03</div>
+    <div class="section-title-block">
+      <div class="section-cat">// Systemic collapse</div>
+      <div class="section-title">ICE DETENTION — THE PAYMENT COLLAPSE CHAIN</div>
+    </div>
+    <div class="section-toggle">▼</div>
+  </div>
+  <div class="section-body">
+    <div class="stat-strip">
+      <div class="stat-cell"><div class="stat-n red">38+</div><div class="stat-d">Deaths in ICE custody<br>2025 through Feb 2026</div><div class="stat-s">// Andrew Free / The Appeal</div></div>
+      <div class="stat-cell"><div class="stat-n red">71%</div><div class="stat-d">Of deaths in<br>for-profit facilities</div><div class="stat-s">// The Appeal, Feb 2026</div></div>
+      <div class="stat-cell"><div class="stat-n gold">68K</div><div class="stat-d">Detained by Feb 7 2026<br>(was 40K in Jan 2025)</div><div class="stat-s">// DHS figures</div></div>
+      <div class="stat-cell"><div class="stat-n red">5x</div><div class="stat-d">Historical death rate<br>since Oct 3 payment stop</div><div class="stat-s">// Popular Information</div></div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-content">
+        <div class="finding-tag confirmed">Confirmed</div>
+        <div class="finding-text">On <strong>October 3, 2025</strong>, ICE stopped paying for third-party medical treatment for detainees. This followed a FOIA lawsuit by CASA (Center to Advance Security in America) filed September 30. The VA — which processed ICE medical billing for 20 years — terminated its agreement three days after the lawsuit. No transition plan existed. Providers began turning patients away immediately.</div>
+      </div>
+      <div class="finding-src">
+        <span class="src-badge">Popular Information</span>
+        <span class="src-badge">Public Citizen</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-content">
+        <div class="finding-tag confirmed">Confirmed</div>
+        <div class="finding-text"><strong>CASA's Director of Research and Policy, Curtis Schube</strong>, came directly from Dhillon Law Group before joining CASA. Dhillon Law Group represents CASA in the lawsuit against the DOJ (Case No. 1:25-cv-03970). Harmeet Dhillon — Schube's former employer — was simultaneously being confirmed as Assistant Attorney General for Civil Rights (confirmed April 3, 2025). Her division later declined to investigate the killing of Renee Good.</div>
+      </div>
+      <div class="finding-src">
+        <span class="src-badge">Court filing<br>1:25-cv-03970</span>
+        <span class="src-badge">DOJ confirmation<br>record</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-content">
+        <div class="finding-tag critical">Critical</div>
+        <div class="finding-text">Acentra Health — brought in to replace the VA as billing processor — was supposed to resume payments by <strong>April 30, 2026</strong>. April 30 came and went. Acentra quietly updated their website pushing the timeline to "second quarter 2026." As of May 2026, payments have still not fully resumed. The medical payment gap has lasted over seven months.</div>
+      </div>
+      <div class="finding-src">
+        <span class="src-badge">Acentra Health<br>website (updated)</span>
+        <span class="src-badge">Popular Information</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-content">
+        <div class="finding-tag confirmed">Confirmed</div>
+        <div class="finding-text">Both GEO Group and CoreCivic lobbyists are <strong>platinum members</strong> of the CBCI's (Congressional Black Caucus Institute) 21st Century Council — a business council of government relations professionals meeting four times per year. CoreCivic donated $25,000 in "honorary expenses" to CBCI in both 2018 and 2019. CBCI chair Rep. Bennie Thompson simultaneously chairs the House Committee on Homeland Security — which has oversight over ICE.</div>
+      </div>
+      <div class="finding-src">
+        <span class="src-badge">CBCI 2019<br>Annual Report</span>
+        <span class="src-badge">House lobbying<br>disclosure</span>
+        <span class="src-badge">American Prospect<br>Aug 2019</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-content">
+        <div class="finding-tag critical">Critical</div>
+        <div class="finding-text">El Paso County Medical Examiner ruled the death of <strong>Geraldo Lunas Campos</strong> at Camp East Montana a <em>homicide</em> — cause: asphyxia due to neck and torso compression. ICE reported it as a suicide while in solitary confinement. Witnesses told press Campos had been handcuffed and choked by guards before his death. ICE transferred the body of a second detainee — Victor Manuel Diaz — to William Beaumont Army Medical Center under federal jurisdiction, removing it from local medical examiner jurisdiction.</div>
+      </div>
+      <div class="finding-src">
+        <span class="src-badge">El Paso County<br>Medical Examiner</span>
+        <span class="src-badge">Scripps News</span>
+        <span class="src-badge">El Paso Matters</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-content">
+        <div class="finding-tag confirmed">Confirmed</div>
+        <div class="finding-text">GEO Group's board of directors has direct ICE lineage: <strong>Julie Wood</strong> was head of ICE from January 2006 to November 2008 and has served on GEO's board since 2018. <strong>Matthew Albence</strong> held multiple ICE positions before joining GEO Group in 2022. Of GEO Group's 13 lobbyists in 2024, <strong>10 previously held government positions</strong>. For CoreCivic, 6 of 10 lobbyists were former government officials.</div>
+      </div>
+      <div class="finding-src">
+        <span class="src-badge">OpenSecrets<br>Apr 2025</span>
+        <span class="src-badge">SEC filings</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- SECTION 4 — CRYPTO / WLFI -->
+<!-- ══════════════════════════════════════ -->
+<div class="section" id="crypto" style="--i:3">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-num">04</div>
+    <div class="section-title-block">
+      <div class="section-cat">// Presidential financial entanglements</div>
+      <div class="section-title">WORLD LIBERTY FINANCIAL & USD1</div>
+    </div>
+    <div class="section-toggle">▼</div>
+  </div>
+  <div class="section-body">
+    <div class="stat-strip">
+      <div class="stat-cell"><div class="stat-n gold">$550M</div><div class="stat-d">Raised via WLFI<br>token sale</div><div class="stat-s">// Arkham Intelligence</div></div>
+      <div class="stat-cell"><div class="stat-n red">75%</div><div class="stat-d">Of all revenue to<br>Trump entities</div><div class="stat-s">// WLF company structure</div></div>
+      <div class="stat-cell"><div class="stat-n red">49%</div><div class="stat-d">UAE Royal stake —<br>undisclosed publicly</div><div class="stat-s">// NYT, Feb 2026</div></div>
+      <div class="stat-cell"><div class="stat-n gold">$2B</div><div class="stat-d">Anonymous wallet<br>received in USD1</div><div class="stat-s">// Reuters, Apr 2026</div></div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-content">
+        <div class="finding-tag confirmed">Confirmed</div>
+        <div class="finding-text">The Trump family owns <strong>60% of World Liberty Financial</strong> through DT Marks DeFi LLC. 75 cents of every dollar raised flows to that entity. Over $550 million raised in token sales. Days before Trump's second inauguration, a UAE-connected investment vehicle purchased 49% of WLF for $500 million. Two UAE-connected board members — <strong>Martin Edelman</strong> and <strong>Peng Xiao</strong> (CEO of G42, with documented Huawei ties) — were placed on WLF's board without public disclosure.</div>
+      </div>
+      <div class="finding-src">
+        <span class="src-badge">NYT Feb 2026</span>
+        <span class="src-badge">Arkham Intelligence</span>
+        <span class="src-badge">House Select<br>Committee probe</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-content">
+        <div class="finding-tag critical">Critical</div>
+        <div class="finding-text">Reuters tracked an anonymous wallet that received <strong>approximately $2 billion in USD1 stablecoin</strong> between April 16–29, 2026. The owner of that wallet remains unidentified. USD1 reserves are held by BitGo in short-term Treasuries — generating hundreds of millions in annual interest income for WLFI while token holders receive none of the yield.</div>
+      </div>
+      <div class="finding-src">
+        <span class="src-badge">Reuters Apr 2026</span>
+        <span class="src-badge">BitGo disclosures</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-content">
+        <div class="finding-tag confirmed">Confirmed</div>
+        <div class="finding-text">In January 2026, Pakistan signed an agreement with a WLF affiliate to integrate <strong>USD1 into Pakistan's national digital payment system</strong> for cross-border transactions. The same month, World Liberty Trust filed for a <strong>U.S. national banking charter</strong>. A sitting president's private financial product is now embedded in a foreign nation's monetary infrastructure.</div>
+      </div>
+      <div class="finding-src">
+        <span class="src-badge">Pakistani govt<br>announcement</span>
+        <span class="src-badge">OCC filing<br>Jan 2026</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-content">
+        <div class="finding-tag unverified">Needs Primary Source</div>
+        <div class="finding-text"><strong>Tempo Blockchain / Joshua Kushner (Thrive Capital)</strong> — $5B valuation attributed in circulating graphic. Thrive Capital is real and significant (led OpenAI funding round) but the specific Tempo Blockchain connection at $5B valuation could not be independently verified from a primary source filing or direct reporting. Do not air without a primary source.</div>
+      </div>
+      <div class="finding-src">
+        <span class="src-badge">⚠ Unverified —<br>needs SEC or<br>press filing</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- SECTION 5 — KUSHNER / AFFINITY -->
+<!-- ══════════════════════════════════════ -->
+<div class="section" id="affinity" style="--i:4">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-num">05</div>
+    <div class="section-title-block">
+      <div class="section-cat">// Foreign entanglement</div>
+      <div class="section-title">AFFINITY PARTNERS — JARED KUSHNER</div>
+    </div>
+    <div class="section-toggle">▼</div>
+  </div>
+  <div class="section-body">
+    <div class="stat-strip">
+      <div class="stat-cell"><div class="stat-n gold">$6.2B</div><div class="stat-d">Affinity AUM<br>end of 2025</div><div class="stat-s">// Bloomberg Mar 2026</div></div>
+      <div class="stat-cell"><div class="stat-n red">99%</div><div class="stat-d">Funding from<br>foreign nationals</div><div class="stat-s">// Rep. Raskin investigation</div></div>
+      <div class="stat-cell"><div class="stat-n gold">$157M</div><div class="stat-d">Management fees<br>from foreign clients</div><div class="stat-s">// Senate Finance Cmte</div></div>
+      <div class="stat-cell"><div class="stat-n red">$0</div><div class="stat-d">Profits returned to<br>investors by 2024</div><div class="stat-s">// Senate Finance Cmte</div></div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-content">
+        <div class="finding-tag confirmed">Confirmed</div>
+        <div class="finding-text">Bloomberg reported in March 2026 that Affinity Partners' assets had surged to <strong>$6.2 billion at end of 2025</strong> — nearly 30% growth in one year. The circulating graphic showing $3 billion is the 2021 commitment number and is significantly outdated. 99% of Affinity's funding comes from foreign nationals including Saudi, UAE, and Qatari sovereign wealth funds.</div>
+      </div>
+      <div class="finding-src">
+        <span class="src-badge">Bloomberg<br>Mar 2026</span>
+        <span class="src-badge">Rep. Raskin<br>House Judiciary</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-content">
+        <div class="finding-tag critical">Critical</div>
+        <div class="finding-text">Senate Finance Committee Ranking Member Wyden and House Oversight Rep. Garcia sent letters in March 2026 demanding answers about <strong>Kushner soliciting billions from Middle Eastern sovereign wealth funds while simultaneously co-leading Trump administration negotiations in the same region</strong> — including Iran ceasefire and Gaza talks. His largest investor is Saudi Crown Prince MBS. His firm collected $87 million directly from the Saudi government.</div>
+      </div>
+      <div class="finding-src">
+        <span class="src-badge">Senate Finance<br>letter Mar 2026</span>
+        <span class="src-badge">House Oversight<br>Mar 2026</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-content">
+        <div class="finding-tag critical">Critical</div>
+        <div class="finding-text">Rep. Jamie Raskin, House Judiciary, April 17 2026: <em>"You cannot both be a diplomat and a financial pawn of the Saudi monarchy at the same time; you cannot faithfully represent the United States with billions of dollars in Saudi and Emirati cash burning a hole in every pocket of every suit you own."</em> Raskin's probe confirmed 99% foreign funding. By 2024 Affinity had <strong>returned zero profits to investors</strong> while collecting $157 million in management fees.</div>
+      </div>
+      <div class="finding-src">
+        <span class="src-badge">Rep. Raskin<br>House Judiciary<br>Apr 17 2026</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- SECTION 6 — CONTRACTORS -->
+<!-- ══════════════════════════════════════ -->
+<div class="section" id="contractors" style="--i:5">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-num">06</div>
+    <div class="section-title-block">
+      <div class="section-cat">// Camp East Montana</div>
+      <div class="section-title">THE CONTRACTOR CHAIN — ACQUISITION LOGISTICS</div>
+    </div>
+    <div class="section-toggle">▼</div>
+  </div>
+  <div class="section-body">
+
+    <div class="finding">
+      <div class="finding-content">
+        <div class="finding-tag confirmed">Confirmed</div>
+        <div class="finding-text"><strong>Acquisition Logistics LLC</strong> — headquarters listed as a modest home in suburban Richmond, Virginia, owned by a 77-year-old retired Navy flight officer. Formed 2008. No prior detention facility experience. No functioning website at contract award (just a login page). Classified as veteran-owned, Hispanic-owned SBA small disadvantaged business — which qualified it for the restricted bidding pool. The $1.3B DHS contract was <strong>8,000% larger than any contract they had ever managed</strong> and 27 times larger than all their prior contracts combined.</div>
+      </div>
+      <div class="finding-src">
+        <span class="src-badge">Public Citizen<br>Apr 2026</span>
+        <span class="src-badge">PBS NewsHour<br>Aug 2025</span>
+        <span class="src-badge">Virginia Corp.<br>Commission</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-content">
+        <div class="finding-tag critical">Critical</div>
+        <div class="finding-text">Key subcontractor: <strong>Disaster Management Group</strong>, owned by <strong>Nathan Albers</strong>. Albers previously co-owned TentLogix — which pleaded guilty in 2019 to knowingly hiring undocumented workers and concealing them from immigration authorities. Albers signed off on the guilty plea. Company fined $3M+, filed bankruptcy. Albers and co-founder Gary Hendry (his former brother-in-law) then founded Disaster Management Group. In 2023 DOL found DMG violated minimum wage laws on Afghan refugee contracts — nearly <strong>$16 million in back wages</strong> paid.</div>
+      </div>
+      <div class="finding-src">
+        <span class="src-badge">ProPublica<br>Jul 2025</span>
+        <span class="src-badge">DOL investigation<br>2023</span>
+        <span class="src-badge">Court records</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-content">
+        <div class="finding-tag critical">Critical</div>
+        <div class="finding-text">Nathan Albers: <strong>$339,218 donated to Republican candidates</strong> ahead of 2026 election. Spent election night 2024 at Mar-a-Lago. Co-chaired charity fundraiser at Trump National Golf Club with Eric Trump. Attended the "Crypto Ball" — tickets $2,500 to $1 million. Now owns a $30 million home in Jupiter, Florida — at the time of purchase ranked as the area's most expensive home. Meanwhile detainees at his company's facility were dying and sleeping in tents in 100-degree desert heat.</div>
+      </div>
+      <div class="finding-src">
+        <span class="src-badge">FEC records</span>
+        <span class="src-badge">ProPublica<br>Jul 2025</span>
+        <span class="src-badge">Scripps News</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div class="finding-content">
+        <div class="finding-tag confirmed">Confirmed</div>
+        <div class="finding-text">Acquisition Logistics failed to register with the Texas Secretary of State's office — a violation of Texas law — despite operating there since July 2025. Attempted to register March 19, 2026 (after DHS terminated them). Registration <strong>rejected March 21</strong> for improper filing. Amentum Services takes over on a no-bid sole-source contract. Amentum has <strong>112 federal regulatory violations</strong> on record including a 2024 fatal workplace accident and OSHA citation for exposing workers to toxic vapors at CIA headquarters.</div>
+      </div>
+      <div class="finding-src">
+        <span class="src-badge">Texas Sec. of State</span>
+        <span class="src-badge">GSA contract<br>database</span>
+        <span class="src-badge">Public Citizen<br>Apr 2026</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- SECTION 7 — KEY ACTORS -->
+<!-- ══════════════════════════════════════ -->
+<div class="section" id="actors" style="--i:6">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-num">07</div>
+    <div class="section-title-block">
+      <div class="section-cat">// Named actors</div>
+      <div class="section-title">WHO'S IN THE ROOM</div>
+    </div>
+    <div class="section-toggle">▼</div>
+  </div>
+  <div class="section-body">
+    <div class="actor-grid">
+
+      <div class="actor-card">
+        <div class="actor-name">HARMEET DHILLON</div>
+        <div class="actor-role">Asst. AG — Civil Rights Division (confirmed Apr 3, 2025)</div>
+        <div class="actor-notes">Founded Dhillon Law Group 2006. Firm employs Curtis Schube, who then joins CASA. CASA files lawsuit September 30. VA collapses October 3. Dhillon confirmed April 3, 2025. Her Civil Rights Division <strong>declines to investigate</strong> the killing of Renee Good — instead attempts to investigate Good's widow. Dhillon Law Group simultaneously represents CASA in the DOJ lawsuit.</div>
+        <div class="actor-links">
+          <div class="actor-link">Case No. 1:25-cv-03970</div>
+          <div class="actor-link">DOJ confirmation record</div>
+        </div>
+      </div>
+
+      <div class="actor-card">
+        <div class="actor-name">CURTIS SCHUBE</div>
+        <div class="actor-role">Director of Research & Policy — CASA</div>
+        <div class="actor-notes">Seven years practicing administrative and election law in Missouri. Pennsylvania Family Institute (pro-life litigation). Fairness Center (anti-union Janus cases). Then: <strong>Dhillon Law Group</strong>. Then: CASA. The pipeline from Dhillon's firm to the nonprofit that triggered the medical payment collapse is direct and documented.</div>
+        <div class="actor-links">
+          <div class="actor-link">CASA founding documents</div>
+          <div class="actor-link">Dhillon Law Group bar records</div>
+        </div>
+      </div>
+
+      <div class="actor-card">
+        <div class="actor-name">JARED KUSHNER</div>
+        <div class="actor-role">Founder — Affinity Partners / U.S. Envoy</div>
+        <div class="actor-notes">Managing $6.2B (99% foreign-funded: Saudi, UAE, Qatar sovereign wealth). Simultaneously assigned as Trump's Middle East / Iran negotiations envoy. Collected $87M directly from Saudi government. <strong>Returned $0 in profits</strong> to investors by 2024 while collecting $157M in management fees. Subject of Senate Finance and House Judiciary probes, April 2026.</div>
+        <div class="actor-links">
+          <div class="actor-link">Bloomberg Mar 2026</div>
+          <div class="actor-link">Raskin House Judiciary Apr 17 2026</div>
+        </div>
+      </div>
+
+      <div class="actor-card">
+        <div class="actor-name">NATHAN ALBERS</div>
+        <div class="actor-role">CEO — Disaster Management Group / Base International</div>
+        <div class="actor-notes">Co-owned TentLogix when it pleaded guilty 2019 to hiring undocumented workers (signed off on plea). Co-founded Disaster Management Group with former brother-in-law Gary Hendry. DMG: $500M+ in government contracts since 2020. <strong>$16M in DOL back wages</strong> 2023. $339,218 in Republican donations ahead of 2026. Mar-a-Lago election night 2024. Golf with Eric Trump. $30M Jupiter home.</div>
+        <div class="actor-links">
+          <div class="actor-link">FEC filings</div>
+          <div class="actor-link">ProPublica Jul 2025</div>
+          <div class="actor-link">Court records — TentLogix plea</div>
+        </div>
+      </div>
+
+      <div class="actor-card">
+        <div class="actor-name">GEORGE ZOLEY</div>
+        <div class="actor-role">Founder & Executive Chairman — GEO Group (NYSE: GEO)</div>
+        <div class="actor-notes">On 2025 earnings call: <em>"unprecedented growth opportunities."</em> GEO Group: $636.2M in Q2 2025 revenue (5% YoY increase). Secured four new ICE contracts for ~6,000 beds. <strong>$1M+ in political contributions</strong> over five years including RNC and Trump PACs. Board stacked with former ICE and DOJ officials. 10 of 13 lobbyists are government revolvers.</div>
+        <div class="actor-links">
+          <div class="actor-link">GEO earnings call Q2 2025</div>
+          <div class="actor-link">OpenSecrets Apr 2025</div>
+        </div>
+      </div>
+
+      <div class="actor-card">
+        <div class="actor-name">REP. BENNIE THOMPSON</div>
+        <div class="actor-role">CBCI Chair / House Homeland Security Chair</div>
+        <div class="actor-notes">Chairs CBCI — which accepted $25,000 in "honorary expenses" from CoreCivic in 2018 and 2019, with Thompson listed as an honoree. Simultaneously chairs House Committee on Homeland Security — which has <strong>direct oversight authority over ICE</strong>. CoreCivic and GEO Group lobbyists are platinum members of CBCI's 21st Century Council. $21,000 in private prison donations per The Appeal's investigation.</div>
+        <div class="actor-links">
+          <div class="actor-link">House lobbying disclosure</div>
+          <div class="actor-link">The Appeal Feb 2026</div>
+          <div class="actor-link">CBCI 2019 Annual Report</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════ -->
+<!-- SECTION 8 — KAYFABE FRAME -->
+<!-- ══════════════════════════════════════ -->
+<div class="section" id="kayfabe" style="--i:7">
+  <div class="section-header" onclick="toggleSection(this)">
+    <div class="section-num">08</div>
+    <div class="section-title-block">
+      <div class="section-cat">// P.O.A.S.T. analytical framework</div>
+      <div class="section-title">THE KAYFABE FRAME</div>
+    </div>
+    <div class="section-toggle">▼</div>
+  </div>
+  <div class="section-body">
+
+    <div class="kayfabe-box">
+      <div class="kb-label">⬡ The Managed Release Template</div>
+      <div class="kb-text">Every major "transparency" release in this period — Epstein files, UFO files — follows the same architecture: <strong>give people something massive to process</strong>, drop it into a pre-existing news storm, attach it to the language of openness and accountability, let the volume do the work of burying the actual signal. The information technically becomes public while functionally disappearing.</div>
+    </div>
+
+    <div class="kayfabe-box" style="border-left-color: var(--gold-dim); background: var(--gold-glow);">
+      <div class="kb-label" style="color: var(--gold);">⬡ The Bipartisan Capture Pattern</div>
+      <div class="kb-text">Notice what crosses party lines. GEO Group and CoreCivic pay Republican PACs and sit at the platinum level of the CBCI — the Black Caucus's institute. Dhillon Law Group (right-wing legal infrastructure) triggers the medical payment collapse. Democratic Reps. Thompson and Cuellar are the top congressional recipients of private prison money. <strong>The game doesn't have a party. It has a revenue stream.</strong></div>
+    </div>
+
+    <div class="kayfabe-box" style="border-left-color: var(--gold-dim); background: var(--gold-glow);">
+      <div class="kb-label" style="color: var(--gold);">⬡ The Pipeline Architecture</div>
+      <div class="kb-text">The mechanism isn't conspiracy — it's <strong>institutional design</strong>. A nonprofit (CASA) staffed by a law firm alumnus (Dhillon) files a lawsuit. The payment system collapses. Providers deny care. People die in for-profit facilities (GEO, CoreCivic) that are simultaneously posting record revenue. The law firm's principal (Dhillon) is now the nation's top civil rights official and declines to investigate federal killings. The private prison CEOs attend inauguration events and donate to PACs. The oversight committee chairman accepts their checks. <em>Nobody needed to conspire. The system runs itself.</em></div>
+    </div>
+
+    <div class="kayfabe-box" style="border-left-color: var(--red-dim); background: var(--red-glow);">
+      <div class="kb-label">⬡ The Sequencing Tells</div>
+      <div class="kb-text">Oct 3: medical payments stop. Dec 2025: deadliest ICE month on record. Dec 19: Epstein drop. Jan 7: Renee Good killed. Jan 24: Alex Pretti killed. Jan 30: 3 million Epstein pages. Feb: Iran war. Mar: contractor swap, no-bid. Apr 17: Kushner probe — <strong>zero sustained coverage</strong>. May 8: UFO files. The sequencing ensures nothing can fully land. That's not accident. That's management.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-logo">Shhh.</div>
+  <div class="footer-right">
+    <div class="footer-tag">@JimmyHitchcock — P.O.A.S.T.</div>
+    <div class="footer-tag">YouTube · Rumble · Podcast</div>
+    <div class="footer-tag">All findings sourced to primary documents,</div>
+    <div class="footer-tag">court filings, SEC/FEC records & named reporting.</div>
+    <div class="footer-tag" style="color: var(--gold-dim); margin-top: 0.5rem;">Less Noise. More Movement. The People Are The Power.</div>
+  </div>
+</footer>
+
+<script>
+// Toggle sections
+function toggleSection(header) {
+  const body = header.nextElementSibling;
+  const toggle = header.querySelector('.section-toggle');
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  toggle.classList.toggle('open', !isOpen);
+  toggle.textContent = isOpen ? '▼' : '▲';
+}
+
+// Nav pill active state on scroll
+const sections = document.querySelectorAll('.section[id]');
+const pills = document.querySelectorAll('.pill');
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const id = entry.target.id;
+      pills.forEach(p => {
+        p.classList.toggle('active', p.getAttribute('href') === '#' + id);
+      });
+    }
+  });
+}, { threshold: 0.2 });
+
+sections.forEach(s => observer.observe(s));
+
+// Search filter
+function filterFindings() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const findings = document.querySelectorAll('.finding, .actor-card, .t-event, .kayfabe-box');
+  let visible = 0;
+
+  findings.forEach(f => {
+    const text = f.textContent.toLowerCase();
+    const match = !q || text.includes(q);
+    f.style.display = match ? '' : 'none';
+    if (match) visible++;
+  });
+
+  const countEl = document.getElementById('searchCount');
+  if (!q) {
+    countEl.textContent = 'All findings shown';
+  } else {
+    countEl.textContent = `${visible} result${visible !== 1 ? 's' : ''} for "${q}"`;
+  }
+
+  // Auto-open sections that have matches
+  if (q) {
+    document.querySelectorAll('.section').forEach(section => {
+      const body = section.querySelector('.section-body');
+      const toggle = section.querySelector('.section-toggle');
+      const hasVisible = [...section.querySelectorAll('.finding, .actor-card, .t-event, .kayfabe-box')]
+        .some(f => f.style.display !== 'none');
+      if (hasVisible) {
+        body.classList.add('open');
+        toggle.classList.add('open');
+        toggle.textContent = '▲';
+      }
+    });
+  }
+}
+
+// Smooth scroll for nav pills
+document.querySelectorAll('.pill[href^="#"]').forEach(pill => {
+  pill.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(pill.getAttribute('href'));
+    if (target) {
+      const body = target.querySelector('.section-body');
+      const toggle = target.querySelector('.section-toggle');
+      body.classList.add('open');
+      toggle.classList.add('open');
+      toggle.textContent = '▲';
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+</script>
+</body>
+</html>

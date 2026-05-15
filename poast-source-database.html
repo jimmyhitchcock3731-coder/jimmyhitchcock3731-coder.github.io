@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P.O.A.S.T. — Source Database & Article Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@300;400;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #080808;
+  --dark: #0e0e0e;
+  --panel: #131313;
+  --panel2: #181818;
+  --border: #202020;
+  --border-lit: #2c2c2c;
+  --off-white: #e8e3d8;
+  --dim: #777;
+  --gold: #c8a84b;
+  --gold-dim: #7a6428;
+  --gold-glow: rgba(200,168,75,0.1);
+  --red: #bf3a2b;
+  --red-dim: #5c1a13;
+  --red-glow: rgba(191,58,43,0.08);
+  --green: #1a8a5a;
+  --green-dim: #0d4530;
+  --mono: 'IBM Plex Mono', monospace;
+  --serif: 'Libre Baskerville', Georgia, serif;
+  --display: 'Bebas Neue', sans-serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--black);color:var(--off-white);font-family:var(--mono);min-height:100vh;overflow-x:hidden;}
+
+/* grain */
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:9000;}
+
+/* HEADER */
+.hdr{position:sticky;top:0;z-index:500;background:var(--black);border-bottom:1px solid var(--border);padding:0.7rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;}
+.logo{font-family:var(--display);font-size:1.8rem;letter-spacing:0.15em;color:var(--gold);text-shadow:0 0 20px rgba(200,168,75,0.2);}
+.logo-sub{font-size:0.48rem;color:var(--gold-dim);letter-spacing:0.22em;text-transform:uppercase;margin-top:0.1rem;}
+.hdr-right{display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;}
+.hbtn{font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;padding:0.28rem 0.65rem;border:1px solid var(--border-lit);color:var(--dim);cursor:pointer;background:transparent;transition:all 0.18s;font-family:var(--mono);}
+.hbtn:hover{border-color:var(--gold-dim);color:var(--gold);}
+.hbtn.active{border-color:var(--gold);color:var(--gold);background:var(--gold-glow);}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--border);background:var(--dark);}
+.tab{flex:1;padding:0.85rem 1rem;font-size:0.55rem;letter-spacing:0.18em;text-transform:uppercase;cursor:pointer;color:var(--dim);border-bottom:2px solid transparent;transition:all 0.2s;text-align:center;}
+.tab:hover{color:var(--off-white);}
+.tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+
+/* PANELS */
+.panel{display:none;}.panel.active{display:block;}
+
+/* ── SOURCE DB ── */
+.db-toolbar{padding:0.8rem 1.5rem;border-bottom:1px solid var(--border);display:flex;gap:0.8rem;align-items:center;flex-wrap:wrap;background:var(--panel);}
+.db-search{flex:1;min-width:180px;background:transparent;border:none;border-bottom:1px solid var(--border-lit);color:var(--off-white);font-family:var(--mono);font-size:0.72rem;padding:0.2rem 0;outline:none;letter-spacing:0.04em;}
+.db-search::placeholder{color:var(--dim);}
+.db-search:focus{border-bottom-color:var(--gold-dim);}
+.db-filter{font-size:0.5rem;letter-spacing:0.12em;text-transform:uppercase;padding:0.22rem 0.5rem;border:1px solid var(--border-lit);color:var(--dim);cursor:pointer;background:transparent;font-family:var(--mono);transition:all 0.18s;}
+.db-filter.on{border-color:var(--gold-dim);color:var(--gold);background:var(--gold-glow);}
+.db-count{font-size:0.5rem;letter-spacing:0.12em;color:var(--dim);}
+.add-src-btn{font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;padding:0.28rem 0.65rem;border:1px solid var(--green-dim);color:var(--green);cursor:pointer;background:transparent;font-family:var(--mono);transition:all 0.18s;margin-left:auto;}
+.add-src-btn:hover{background:rgba(26,138,90,0.1);}
+
+.src-grid{padding:1rem 1.5rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:0.8rem;}
+.src-card{background:var(--panel);border:1px solid var(--border);padding:1rem;transition:border-color 0.18s;position:relative;cursor:pointer;}
+.src-card:hover{border-color:var(--border-lit);}
+.src-card.selected{border-color:var(--gold);background:var(--gold-glow);}
+.src-card.selected::after{content:'✓ SELECTED';position:absolute;top:0.5rem;right:0.5rem;font-size:0.44rem;letter-spacing:0.15em;color:var(--gold);background:rgba(200,168,75,0.15);padding:0.12rem 0.35rem;border:1px solid var(--gold-dim);}
+.src-cat-badge{display:inline-block;font-size:0.44rem;letter-spacing:0.16em;text-transform:uppercase;padding:0.1rem 0.35rem;border:1px solid;margin-bottom:0.5rem;}
+.cat-primary{color:var(--green);border-color:var(--green-dim);}
+.cat-court{color:#e67e22;border-color:#7d4a0f;}
+.cat-press{color:var(--gold);border-color:var(--gold-dim);}
+.cat-govt{color:#2e7fb8;border-color:#1a4a6e;}
+.cat-fec{color:#9b59b6;border-color:#5b2d7a;}
+.cat-advocacy{color:#e74c3c;border-color:#7b241c;}
+.src-title{font-size:0.75rem;font-weight:600;color:var(--off-white);line-height:1.4;margin-bottom:0.35rem;}
+.src-pub{font-size:0.52rem;color:var(--dim);letter-spacing:0.08em;margin-bottom:0.2rem;}
+.src-date{font-size:0.48rem;color:var(--gold-dim);letter-spacing:0.1em;}
+.src-thread{font-size:0.46rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--dim);margin-top:0.4rem;padding-top:0.4rem;border-top:1px solid var(--border);}
+.src-link{display:block;font-size:0.46rem;color:var(--gold-dim);margin-top:0.3rem;word-break:break-all;text-decoration:none;}
+.src-link:hover{color:var(--gold);}
+
+/* ADD SOURCE MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:800;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--dark);border:1px solid var(--border-lit);padding:1.5rem;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;}
+.modal-title{font-family:var(--display);font-size:1.5rem;letter-spacing:0.08em;color:var(--gold);margin-bottom:1.2rem;}
+.field{margin-bottom:1rem;}
+.field label{display:block;font-size:0.5rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--dim);margin-bottom:0.35rem;}
+.field input,.field select,.field textarea{width:100%;background:var(--panel);border:1px solid var(--border-lit);color:var(--off-white);font-family:var(--mono);font-size:0.72rem;padding:0.5rem 0.7rem;outline:none;letter-spacing:0.03em;transition:border-color 0.18s;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--gold-dim);}
+.field select option{background:var(--dark);}
+.field textarea{resize:vertical;min-height:70px;}
+.modal-btns{display:flex;gap:0.6rem;justify-content:flex-end;margin-top:1.2rem;}
+.mbtn{font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;padding:0.4rem 0.9rem;border:1px solid;cursor:pointer;font-family:var(--mono);transition:all 0.18s;}
+.mbtn.save{border-color:var(--gold-dim);color:var(--gold);background:var(--gold-glow);}
+.mbtn.save:hover{background:rgba(200,168,75,0.2);}
+.mbtn.cancel{border-color:var(--border-lit);color:var(--dim);}
+.mbtn.cancel:hover{border-color:var(--red-dim);color:var(--red);}
+
+/* ── ARTICLE BUILDER ── */
+.builder-layout{display:grid;grid-template-columns:1fr 1fr;height:calc(100vh - 120px);}
+@media(max-width:700px){.builder-layout{grid-template-columns:1fr;height:auto;}}
+.builder-left{border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.builder-right{display:flex;flex-direction:column;overflow:hidden;}
+
+.builder-toolbar{padding:0.7rem 1rem;border-bottom:1px solid var(--border);display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;background:var(--panel);flex-shrink:0;}
+.btoolbar-label{font-size:0.48rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--dim);}
+.btbtn{font-size:0.48rem;letter-spacing:0.12em;text-transform:uppercase;padding:0.22rem 0.5rem;border:1px solid var(--border-lit);color:var(--dim);cursor:pointer;background:transparent;font-family:var(--mono);transition:all 0.18s;}
+.btbtn:hover{border-color:var(--gold-dim);color:var(--gold);}
+.btbtn.gen{border-color:var(--gold-dim);color:var(--gold);background:var(--gold-glow);}
+.btbtn.gen:hover{background:rgba(200,168,75,0.2);}
+
+.sel-sources-panel{padding:0.8rem 1rem;border-bottom:1px solid var(--border);background:var(--dark);flex-shrink:0;}
+.sel-label{font-size:0.48rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--dim);margin-bottom:0.5rem;}
+.sel-tags{display:flex;gap:0.35rem;flex-wrap:wrap;min-height:24px;}
+.sel-tag{font-size:0.46rem;letter-spacing:0.1em;text-transform:uppercase;padding:0.15rem 0.4rem;background:var(--gold-glow);border:1px solid var(--gold-dim);color:var(--gold);cursor:pointer;}
+.sel-tag:hover::after{content:' ✕';}
+.sel-empty{font-size:0.5rem;color:var(--dim);font-style:italic;}
+
+.article-config{padding:0.8rem 1rem;border-bottom:1px solid var(--border);background:var(--panel);flex-shrink:0;}
+.config-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;}
+.cfg-field label{display:block;font-size:0.46rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--dim);margin-bottom:0.3rem;}
+.cfg-field input,.cfg-field select{width:100%;background:var(--dark);border:1px solid var(--border-lit);color:var(--off-white);font-family:var(--mono);font-size:0.65rem;padding:0.35rem 0.5rem;outline:none;}
+.cfg-field input:focus,.cfg-field select:focus{border-color:var(--gold-dim);}
+
+.article-area{flex:1;overflow-y:auto;padding:1rem;}
+.article-placeholder{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:1rem;opacity:0.4;}
+.placeholder-icon{font-family:var(--display);font-size:4rem;color:var(--gold);}
+.placeholder-text{font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--dim);}
+
+.article-output{font-family:var(--serif);font-size:0.9rem;line-height:1.85;color:var(--off-white);}
+.article-output h1{font-family:var(--display);font-size:2.2rem;letter-spacing:0.04em;color:var(--off-white);line-height:1;margin-bottom:0.5rem;}
+.article-output h2{font-family:var(--display);font-size:1.3rem;letter-spacing:0.06em;color:var(--gold);margin:1.5rem 0 0.5rem;border-left:3px solid var(--gold-dim);padding-left:0.6rem;}
+.article-output p{margin-bottom:1rem;color:#ccc8bc;}
+.article-output strong{color:var(--off-white);}
+.article-output em{color:var(--dim);}
+.article-output .citation{font-size:0.55rem;font-family:var(--mono);color:var(--gold-dim);vertical-align:super;letter-spacing:0.05em;cursor:default;}
+.article-output .byline{font-family:var(--mono);font-size:0.58rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--dim);margin-bottom:1.5rem;padding-bottom:0.8rem;border-bottom:1px solid var(--border);}
+.article-output .deck{font-family:var(--mono);font-size:0.8rem;color:var(--dim);line-height:1.65;margin-bottom:1.5rem;padding:0.8rem;background:var(--dark);border-left:3px solid var(--border-lit);}
+.article-output .source-list{margin-top:2rem;padding-top:1rem;border-top:1px solid var(--border);}
+.article-output .source-list h3{font-family:var(--mono);font-size:0.55rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--dim);margin-bottom:0.8rem;}
+.article-output .source-item{font-family:var(--mono);font-size:0.6rem;color:var(--dim);margin-bottom:0.4rem;padding-left:1rem;position:relative;}
+.article-output .source-item::before{content:'↗';position:absolute;left:0;color:var(--gold-dim);}
+
+.preview-toolbar{padding:0.6rem 1rem;border-bottom:1px solid var(--border);display:flex;gap:0.5rem;align-items:center;background:var(--dark);flex-shrink:0;}
+.copy-btn{font-size:0.48rem;letter-spacing:0.14em;text-transform:uppercase;padding:0.25rem 0.6rem;border:1px solid var(--green-dim);color:var(--green);cursor:pointer;background:transparent;font-family:var(--mono);margin-left:auto;transition:all 0.18s;}
+.copy-btn:hover{background:rgba(26,138,90,0.1);}
+.copy-btn.copied{border-color:var(--gold-dim);color:var(--gold);}
+
+.loading-bar{display:none;height:2px;background:linear-gradient(90deg,var(--gold),var(--red),var(--gold));background-size:200%;animation:shimmer 1.2s infinite linear;}
+@keyframes shimmer{0%{background-position:200%}100%{background-position:-200%}}
+
+/* ── STATS VIEW ── */
+.stats-grid{padding:1.5rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;}
+.stat-card{background:var(--panel);border:1px solid var(--border);padding:1.2rem;}
+.stat-big{font-family:var(--display);font-size:3rem;line-height:1;color:var(--gold);margin-bottom:0.3rem;}
+.stat-lbl{font-size:0.52rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--dim);}
+.thread-list{padding:0 1.5rem 1.5rem;}
+.thread-item{display:flex;align-items:center;justify-content:space-between;padding:0.7rem 0;border-bottom:1px solid var(--border);}
+.thread-item:last-child{border-bottom:none;}
+.thread-name{font-size:0.65rem;letter-spacing:0.06em;color:var(--off-white);}
+.thread-count{font-family:var(--display);font-size:1.2rem;color:var(--gold);}
+.thread-bar{flex:1;height:3px;background:var(--border);margin:0 1rem;position:relative;}
+.thread-fill{height:100%;background:var(--gold);transition:width 0.5s ease;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.panel.active{animation:fadeUp 0.35s ease both;}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div>
+    <div class="logo">P.O.A.S.T.</div>
+    <div class="logo-sub">Source Database & Article Builder</div>
+  </div>
+  <div class="hdr-right">
+    <button class="hbtn" onclick="exportSources()">↓ Export Sources</button>
+    <button class="hbtn" onclick="openModal()">+ Add Source</button>
+  </div>
+</header>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('db')">Source Database</div>
+  <div class="tab" onclick="switchTab('builder')">Article Builder</div>
+  <div class="tab" onclick="switchTab('stats')">Thread Analysis</div>
+</div>
+
+<!-- ══════════ SOURCE DATABASE TAB ══════════ -->
+<div id="tab-db" class="panel active">
+  <div class="db-toolbar">
+    <input class="db-search" type="text" id="dbSearch" placeholder="Search sources..." oninput="filterSources()">
+    <button class="db-filter on" onclick="toggleFilter(this,'all')">All</button>
+    <button class="db-filter" onclick="toggleFilter(this,'ICE / Detention')">ICE</button>
+    <button class="db-filter" onclick="toggleFilter(this,'Renée Good')">Good Case</button>
+    <button class="db-filter" onclick="toggleFilter(this,'Contractors')">Contractors</button>
+    <button class="db-filter" onclick="toggleFilter(this,'Crypto / WLFI')">Crypto</button>
+    <button class="db-filter" onclick="toggleFilter(this,'Affinity / Kushner')">Kushner</button>
+    <button class="db-filter" onclick="toggleFilter(this,'Epstein / UFO')">Epstein</button>
+    <button class="db-filter" onclick="toggleFilter(this,'CBCI')">CBCI</button>
+    <span class="db-count" id="dbCount"></span>
+    <button class="add-src-btn" onclick="openModal()">+ Add Source</button>
+  </div>
+  <div class="src-grid" id="srcGrid"></div>
+</div>
+
+<!-- ══════════ ARTICLE BUILDER TAB ══════════ -->
+<div id="tab-builder" class="panel">
+  <div class="builder-layout">
+    <!-- LEFT: config + selected sources -->
+    <div class="builder-left">
+      <div class="builder-toolbar">
+        <span class="btoolbar-label">// Select sources from DB then configure below</span>
+      </div>
+      <div class="sel-sources-panel">
+        <div class="sel-label">Selected Sources (<span id="selCount">0</span>)</div>
+        <div class="sel-tags" id="selTags"><span class="sel-empty">No sources selected — go to Source Database tab and click cards to select them</span></div>
+      </div>
+      <div class="article-config">
+        <div style="font-size:0.5rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--dim);margin-bottom:0.7rem;">// Article Configuration</div>
+        <div class="config-grid">
+          <div class="cfg-field">
+            <label>Article Type</label>
+            <select id="articleType">
+              <option value="investigative">Investigative Deep Dive</option>
+              <option value="explainer">Explainer / Breakdown</option>
+              <option value="thread">Thread Summary</option>
+              <option value="op-ed">Op-Ed / Analysis</option>
+              <option value="update">News Update</option>
+            </select>
+          </div>
+          <div class="cfg-field">
+            <label>Primary Thread</label>
+            <select id="articleThread">
+              <option value="ice">ICE / Detention System</option>
+              <option value="renee">Renée Good Case</option>
+              <option value="contractors">Camp East Montana / Contractors</option>
+              <option value="crypto">Trump Crypto / WLFI</option>
+              <option value="kushner">Kushner / Affinity</option>
+              <option value="epstein">Epstein / UFO Files</option>
+              <option value="kayfabe">Full Kayfabe Frame</option>
+            </select>
+          </div>
+          <div class="cfg-field">
+            <label>Tone</label>
+            <select id="articleTone">
+              <option value="investigative">Investigative — factual, sourced</option>
+              <option value="poast">P.O.A.S.T. voice — sharp, direct</option>
+              <option value="formal">Formal journalism</option>
+              <option value="accessible">Plain language / accessible</option>
+            </select>
+          </div>
+          <div class="cfg-field">
+            <label>Length</label>
+            <select id="articleLength">
+              <option value="medium">Medium (~800 words)</option>
+              <option value="long">Long (~1500 words)</option>
+              <option value="short">Short (~400 words)</option>
+            </select>
+          </div>
+        </div>
+        <div class="cfg-field" style="margin-top:0.7rem;">
+          <label>Custom Focus / Angle (optional)</label>
+          <input type="text" id="articleFocus" placeholder="e.g. Focus on the Dhillon pipeline to ICE deaths...">
+        </div>
+        <button class="btbtn gen" style="margin-top:0.8rem;width:100%;padding:0.5rem;" onclick="generateArticle()">▶ Generate Substack Article</button>
+      </div>
+    </div>
+
+    <!-- RIGHT: article preview -->
+    <div class="builder-right">
+      <div class="preview-toolbar">
+        <span style="font-size:0.5rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--dim);">// Article Preview</span>
+        <button class="copy-btn" id="copyBtn" onclick="copyArticle()">Copy for Substack</button>
+      </div>
+      <div class="loading-bar" id="loadingBar"></div>
+      <div class="article-area" id="articleArea">
+        <div class="article-placeholder">
+          <div class="placeholder-icon">P.</div>
+          <div class="placeholder-text">Select sources → Configure → Generate</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ STATS TAB ══════════ -->
+<div id="tab-stats" class="panel">
+  <div class="stats-grid" id="statsGrid"></div>
+  <div style="font-size:0.52rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--dim);padding:1.5rem 1.5rem 0.5rem;">// Sources by investigative thread</div>
+  <div class="thread-list" id="threadList"></div>
+</div>
+
+<!-- ADD SOURCE MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="modal-title">ADD SOURCE</div>
+    <div class="field"><label>Title / Headline</label><input type="text" id="mTitle" placeholder="Article or document title"></div>
+    <div class="field"><label>Publication / Source</label><input type="text" id="mPub" placeholder="Reuters, ProPublica, Court Filing..."></div>
+    <div class="field"><label>Date</label><input type="text" id="mDate" placeholder="Jan 7, 2026"></div>
+    <div class="field"><label>URL (optional)</label><input type="text" id="mUrl" placeholder="https://..."></div>
+    <div class="field">
+      <label>Category</label>
+      <select id="mCat">
+        <option value="court">Court Filing / Legal Record</option>
+        <option value="press">Press / Journalism</option>
+        <option value="govt">Government Document / Statement</option>
+        <option value="fec">FEC / Financial Record</option>
+        <option value="primary">Primary Document</option>
+        <option value="advocacy">Advocacy / Watchdog</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Investigative Thread</label>
+      <select id="mThread">
+        <option value="ICE / Detention">ICE / Detention System</option>
+        <option value="Renée Good">Renée Good Case</option>
+        <option value="Contractors">Camp East Montana / Contractors</option>
+        <option value="Crypto / WLFI">Trump Crypto / WLFI</option>
+        <option value="Affinity / Kushner">Affinity / Kushner</option>
+        <option value="Epstein / UFO">Epstein / UFO Files</option>
+        <option value="CBCI">CBCI Capture</option>
+        <option value="General">General / Cross-thread</option>
+      </select>
+    </div>
+    <div class="field"><label>Key Finding (1-2 sentences)</label><textarea id="mFinding" placeholder="What does this source prove or establish?"></textarea></div>
+    <div class="modal-btns">
+      <button class="mbtn cancel" onclick="closeModal()">Cancel</button>
+      <button class="mbtn save" onclick="saveSource()">Save Source</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── SOURCE DATA ───
+const SOURCES = [
+  // ICE / DETENTION
+  {id:1, title:"ICE Stops Paying for Third-Party Medical Treatment — Oct 3, 2025", pub:"Popular Information", date:"Oct 2025", url:"", cat:"press", thread:"ICE / Detention", finding:"VA billing terminated 3 days after CASA lawsuit. ICE stopped all outside medical payments. Anonymous DHS source confirmed providers began denying care immediately."},
+  {id:2, title:"Billion Dollar Collapse: The Anatomy and Failure of an ICE Detention Center Contract", pub:"Public Citizen", date:"Apr 13, 2026", url:"https://www.citizen.org/article/billion-dollar-collapse/", cat:"advocacy", thread:"Contractors", finding:"Acquisition Logistics LLC contract was 8,000% larger than their prior largest deal. Three deaths. 49 violations. Company never registered in Texas."},
+  {id:3, title:"Of 38 ICE Deaths, 71% Occurred in For-Profit Facilities", pub:"The Appeal / Andrew Free", date:"Feb 2026", url:"https://inthesetimes.com/article/ice-immigration-customs-enforcement-private-prisons-geo-group-corecivic", cat:"press", thread:"ICE / Detention", finding:"71% of 38 ICE deaths between 2025 and Feb 1 2026 occurred in for-profit GEO Group or CoreCivic facilities."},
+  {id:4, title:"Private Prison Companies' Enormous Windfall", pub:"Brennan Center for Justice", date:"Oct 1, 2025", url:"https://www.brennancenter.org/our-work/analysis-opinion/private-prison-companies-enormous-windfall-who-stands-gain-ice-expands", cat:"advocacy", thread:"ICE / Detention", finding:"GEO Group Q2 revenue $636.2M (+5% YoY). CoreCivic $538.2M (+10%). Both securing billions in new ICE contracts. $45B approved in One Big Beautiful Bill Act."},
+  {id:5, title:"ICE Detained Population Surges from 40K to 68K — Jan to Feb 2026", pub:"DHS figures / Popular Information", date:"Feb 2026", url:"", cat:"govt", thread:"ICE / Detention", finding:"Detainee population increased 70% in just over a year, while medical payment system remained broken."},
+  {id:6, title:"Death Rate 5x Historical Average Since Oct 3 Payment Stop", pub:"Popular Information", date:"2026", url:"", cat:"press", thread:"ICE / Detention", finding:"Since ICE stopped paying medical providers on Oct 3 2025, detainee death rate has accelerated to more than five times the historical average."},
+  {id:7, title:"Acentra Health Misses April 30 Payment Restart Deadline", pub:"Acentra Health website / Popular Information", date:"May 2026", url:"", cat:"primary", thread:"ICE / Detention", finding:"Acentra Health, brought in to replace VA billing, missed its contractual April 30 2026 restart date. Quietly pushed to Q2 2026. Still not operational."},
+  {id:8, title:"GEO Group Board: Former ICE Head Julie Wood, Matthew Albence", pub:"OpenSecrets", date:"Apr 2025", url:"https://www.opensecrets.org/news/2025/04/private-prison-companies-positioned-to-benefit-from-increased-deportations/", cat:"primary", thread:"ICE / Detention", finding:"GEO Group board stacked with former ICE/DOJ officials. 10 of 13 GEO lobbyists in 2024 previously held government positions."},
+  {id:9, title:"ICE-Cold Cash: Private Prison Donations to Members of Congress", pub:"The Appeal / In These Times", date:"Feb 6, 2026", url:"https://inthesetimes.com/article/ice-immigration-customs-enforcement-private-prisons-geo-group-corecivic", cat:"press", thread:"CBCI", finding:"GEO Group and CoreCivic donated $500K+ to Republican members, $57K to Democrats. GEO exec George Zoley donated $1M+ including to RNC and Trump PACs."},
+  {id:10, title:"North Lake Processing Center: 50+ Emergency Calls in 3 Months", pub:"Detroit News", date:"2025", url:"", cat:"press", thread:"ICE / Detention", finding:"GEO Group-operated North Lake called emergency services 50+ times in Q4 2025. Lawyers reported clients denied insulin and chronic care medications."},
+
+  // RENÉE GOOD
+  {id:11, title:"Killing of Renée Good — Full Case Record", pub:"Multiple / Wikipedia aggregate", date:"Jan–May 2026", url:"https://en.wikipedia.org/wiki/Killing_of_Ren%C3%A9e_Good", cat:"press", thread:"Renée Good", finding:"37-year-old U.S. citizen shot 3 times by ICE agent Jonathan Ross on Jan 7 2026. Video shows Ross standing outside vehicle path when he fired. DHS policy discourages shooting at moving vehicles."},
+  {id:12, title:"ICE Shooting Timeline: Video Analysis of Renee Good's Death", pub:"Newsweek", date:"Jan 8, 2026", url:"https://newsweek.com/ice-shooting-timeline-video-analysis-of-renee-goods-death-11328177", cat:"press", thread:"Renée Good", finding:"Frame-by-frame video analysis showing Ross fired first into windshield then through driver window at close range. Good's car was moving away."},
+  {id:13, title:"Renée Good Shot in the Head — Family Autopsy Finds 3 Gunshot Wounds", pub:"NBC News", date:"Jan 21, 2026", url:"https://nbcnews.com/news/us-news/renee-good-was-shot-head-autopsy-commissioned-family-finds-rcna255335", cat:"primary", thread:"Renée Good", finding:"Family autopsy: 3 clear gunshot wounds plus graze. Fatal wound to head. Wound to left forearm, wound to right breast (neither immediately life-threatening). Grazed a 4th time."},
+  {id:14, title:"Reports, Videos Show How ICE Agent Jonathan Ross Fatally Shot Renée Good", pub:"CNN", date:"Jan 17, 2026", url:"https://www.cnn.com/2026/01/17/us/ice-shooting-minneapolis-renee-good", cat:"press", thread:"Renée Good", finding:"Ross fired first into windshield then at close range through open driver window. Other ICE officer nearly shot by Ross. Good shot after 9:30am. Medical evacuation delayed by ICE agents."},
+  {id:15, title:"DOJ Civil Rights Division Will Not Investigate Minneapolis ICE Shooting", pub:"CBS News", date:"Jan 10, 2026", url:"https://www.cbsnews.com/news/doj-civil-rights-division-will-not-investigate-minneapolis-ice-shooting-sources-say/", cat:"govt", thread:"Renée Good", finding:"Harmeet Dhillon told Civil Rights prosecutors they would not investigate. FBI announced it would lead investigation instead. Video shows officers did not take immediate steps to ensure Good received emergency care."},
+  {id:16, title:"Four Top DOJ Officials Resign Over Refusal to Probe ICE Killing", pub:"Democracy Now / Common Dreams", date:"Jan 13, 2026", url:"https://www.democracynow.org/2026/1/13/headlines/four_top_doj_officials_resign_over_decision_not_to_probe_ice_killing_of_renee_good", cat:"press", thread:"Renée Good", finding:"Chief Jim Felte + principal deputy chief + deputy chief + acting deputy chief all resigned January 13, 2026 in protest of Dhillon's decision."},
+  {id:17, title:"Federal Officials Investigating Renée Good's Partner — Not the Shooter", pub:"NBC News", date:"Jan 17, 2026", url:"https://www.nbcnews.com/politics/justice-department/federal-officials-investigating-renee-goods-partner-rcna254038", cat:"press", thread:"Renée Good", finding:"DOJ investigated Rebecca Good (Renée's widow) to determine whether she impeded a federal officer. The victim's widow became the investigation target."},
+  {id:18, title:"Whitehouse & Durbin Demand Investigation of DOJ Decision to Block Civil Rights Probe", pub:"Sen. Whitehouse / Senate Judiciary", date:"Mar 4, 2026", url:"https://www.whitehouse.senate.gov/news/release/whitehouse-durbin-demand-investigation-of-doj-decision-to-block-civil-rights-probe-into-ice-shooting-of-renee-good/", cat:"govt", thread:"Renée Good", finding:"Senators demanded IG and OPR investigation into Kash Patel's blocking of civil rights inquiry. Confirmed Patel wanted warrants that framed Good as subject — not victim."},
+  {id:19, title:"Tracee Mergen — FBI Minneapolis Supervisor Resigns After Pushed to Abandon Inquiry", pub:"New York Times", date:"Jan 23, 2026", url:"", cat:"press", thread:"Renée Good", finding:"FBI Minneapolis field office supervisor resigned Jan 23 after FBI leadership under Patel pushed her to abandon the civil rights inquiry into Ross."},
+  {id:20, title:"Minnesota, Hennepin County Sue DOJ and DHS for Withholding Evidence", pub:"Minnesota AG / AP", date:"Mar 24, 2026", url:"", cat:"court", thread:"Renée Good", finding:"Minnesota + Hennepin County + Minnesota BCA filed suit March 24 alleging DOJ/DHS withholding evidence about Good's killing, Pretti's killing, and Sosa-Celis shooting to shield federal officers."},
+  {id:21, title:"Federal Government Turns Over Evidence From Renée Good Shooting Under Court Order", pub:"Star Tribune", date:"May 2026", url:"https://www.startribune.com/federal-government-turns-over-evidence-from-the-shooting-death-of-renee-good-for-court-review/601837483", cat:"court", thread:"Renée Good", finding:"Feds turned over Ross's medical exams, lab results, fitness-for-duty evaluations, and mental health evaluations under court order. Also DHS use-of-force policies from the relevant period."},
+  {id:22, title:"Opening an Investigation of ICE Agent Who Killed Renée Good — Just Security Analysis", pub:"Just Security", date:"Feb 4, 2026", url:"https://www.justsecurity.org/129439/investigation-ice-jonathan-ross-renee-good/", cat:"advocacy", thread:"Renée Good", finding:"Former 10-year DOJ Civil Rights Division prosecutor: 'There is more than enough for DOJ to investigate here.' DHS violated its own 2023 use-of-force policy discouraging shooting at moving vehicles."},
+  {id:23, title:"MN Oversight Report — Operation Metro Surge", pub:"House Oversight Democrats", date:"2026", url:"https://oversightdemocrats.house.gov/imo/media/doc/mn_oversight_report.pdf", cat:"govt", thread:"Renée Good", finding:"DHS deployed 2,000 agents to Minneapolis-St. Paul area. Good killed Jan 7. Pretti killed Jan 24. Both within 2 miles of each other. ICE officer warned protester she could 'meet the same fate.'"},
+  {id:24, title:"Alex Pretti — ICU Nurse and U.S. Citizen Shot by CBP Jan 24 2026", pub:"Multiple", date:"Jan 24, 2026", url:"", cat:"press", thread:"Renée Good", finding:"37-year-old ICU nurse and U.S. citizen killed by CBP in Minneapolis, 17 days after Renée Good, less than 2 miles away. Video contradicts government account. No federal charges filed."},
+
+  // CONTRACTORS
+  {id:25, title:"Mystery Surrounds $1.2B Army Contract to Build Huge Detention Camp", pub:"PBS NewsHour", date:"Aug 2025", url:"https://www.pbs.org/newshour/politics/mystery-surrounds-1-2-billion-army-contract-to-build-huge-detention-tent-camp-in-texas-desert", cat:"press", thread:"Contractors", finding:"Acquisition Logistics LLC: suburban Virginia house address, 77-year-old retired Navy officer. No detention experience. Blank website. Army refused to release contract or explain selection."},
+  {id:26, title:"His Former Company Got Caught Employing Undocumented Workers. Now He's Profiting.", pub:"ProPublica", date:"Jul 25, 2025", url:"https://www.propublica.org/article/nathan-albers-fort-bliss-immigration", cat:"press", thread:"Contractors", finding:"Nathan Albers/DMG is key subcontractor. TentLogix (Albers co-owner) pleaded guilty 2019 to hiring undocumented workers. Albers signed guilty plea. Mar-a-Lago donor. $30M home."},
+  {id:27, title:"Camp East Montana — El Paso County Medical Examiner Rules Homicide", pub:"El Paso Matters / Spectrum News", date:"Jan–Mar 2026", url:"https://elpasomatters.org/2026/03/12/ice-replacing-camp-east-montana-detention-center-operator-contract-washington-post/", cat:"primary", thread:"Contractors", finding:"Geraldo Lunas Campos death ruled homicide — asphyxia via neck/torso compression. ICE called it suicide. Witnesses reported handcuffing and choking by guards. Second body transferred to federal jurisdiction."},
+  {id:28, title:"Disaster Management Group — $16M DOL Back Wages, Labor Violations", pub:"ProPublica / DOL", date:"2023", url:"", cat:"primary", thread:"Contractors", finding:"DOL found DMG violated federal labor laws on Afghan refugee contract. Nearly $16 million in back wages owed. Paid in 2023. Same company now building largest ICE detention facility in U.S. history."},
+  {id:29, title:"FEC Records — Nathan Albers $339,218 Republican Donations Pre-2026 Election", pub:"FEC", date:"2025–2026", url:"", cat:"fec", thread:"Contractors", finding:"FEC: Albers donated $339,218 to Republican candidates ahead of 2026 election. Contributions to Trump PACs documented. Albers also listed as CEO of Base International."},
+  {id:30, title:"New Contractor Amentum Has 112 Federal Regulatory Violations", pub:"Scripps News / Public Citizen", date:"Mar–Apr 2026", url:"https://www.tmj4.com/investigations/ice-inc/new-contractor-at-troubled-ice-detention-center-has-dozens-of-past-federal-violations", cat:"press", thread:"Contractors", finding:"Amentum received no-bid sole-source contract. 112 federal violations. 2024 fatal workplace accident. OSHA citation at CIA HQ for toxic vapor exposure. Was already Acq. Logistics subcontractor."},
+  {id:31, title:"Camp East Montana — 60 Federal Standard Violations in First 50 Days", pub:"ICE Oversight Unit", date:"2025", url:"", cat:"govt", thread:"Contractors", finding:"ICE's own detention oversight unit found 60 federal standard violations in Camp East Montana's first 50 days of operation."},
+  {id:32, title:"Acquisition Logistics Never Registered in Texas — State Law Violation", pub:"Texas Secretary of State / Public Citizen", date:"Mar 2026", url:"", cat:"court", thread:"Contractors", finding:"Company operated in Texas from July 2025 without registering with TX Sec. of State. Attempted registration March 19 2026 — after termination. Rejected March 21 for improper filing."},
+
+  // DHILLON / CASA
+  {id:33, title:"CASA v. DOJ — FOIA Lawsuit — Case No. 1:25-cv-03970", pub:"U.S. District Court", date:"Sep 30, 2025", url:"", cat:"court", thread:"ICE / Detention", finding:"CASA filed lawsuit September 30 targeting VA's ICE billing role. Represented by Dhillon Law Group. Filed 3 days before VA terminated billing agreement. Curtis Schube (CASA) formerly worked at Dhillon Law Group."},
+  {id:34, title:"Harmeet Dhillon Confirmed as Assistant AG for Civil Rights — April 3, 2025", pub:"DOJ / Senate Judiciary", date:"Apr 3, 2025", url:"", cat:"govt", thread:"Renée Good", finding:"Dhillon confirmed April 3 2025. Her former law firm employs Schube who went to CASA. CASA's lawsuit collapsed ICE medical billing. Dhillon then blocked civil rights probe into Renée Good's killing."},
+
+  // CBCI
+  {id:35, title:"Congressional Black Caucus Institute Takes CoreCivic Cash", pub:"American Prospect / Sludge", date:"Aug 2019", url:"https://prospect.org/2019/08/16/congressional-black-caucus-institute-takes-corecivic-cash-boosts-policies-help-private-prisons/", cat:"press", thread:"CBCI", finding:"CBCI's 21st Century Council lists GEO Group and CoreCivic lobbyists as platinum members. CoreCivic donated $25K in honorary expenses in 2018 and 2019. Rep. Thompson honored at both events."},
+  {id:36, title:"Congressional Black Caucus Institute Accepts Private Prison Donations", pub:"Prison Legal News", date:"Oct 2019", url:"https://www.prisonlegalnews.org/news/2019/oct/4/congressional-black-caucus-institute-accepts-donations-private-prison-companies/", cat:"press", thread:"CBCI", finding:"CoreCivic lobbying disclosure shows $25K to CBCI April 15 2019. Honorees: Rep. Bennie Thompson (CBCI chair), Rep. Jim Clyburn, Cedric Richmond. Since 2008 ICE awarded GEO $1.9B and CoreCivic $1.1B."},
+
+  // CRYPTO / WLFI
+  {id:37, title:"UAE Royal Entity Purchased 49% of World Liberty Financial", pub:"New York Times", date:"Feb 2026", url:"", cat:"press", thread:"Crypto / WLFI", finding:"UAE-connected entity purchased 49% of WLFI for $500M days before Trump's inauguration. Board members Martin Edelman and Peng Xiao (CEO of G42/Huawei ties) placed without public disclosure."},
+  {id:38, title:"Reuters Tracks $2B Anonymous USD1 Wallet — Owner Unidentified", pub:"Reuters", date:"Apr 2026", url:"", cat:"press", thread:"Crypto / WLFI", finding:"Reuters tracked anonymous wallet receiving approximately $2 billion in USD1 stablecoin April 16-29 2026. Wallet owner remains publicly unidentified."},
+  {id:39, title:"World Liberty Financial Structure — Trump Family Owns 60% via DT Marks DeFi LLC", pub:"Arkham Intelligence / WLFI disclosures", date:"2025–2026", url:"", cat:"primary", thread:"Crypto / WLFI", finding:"Trump family owns 60% of WLFI through DT Marks DeFi LLC. 75 cents of every dollar raised flows to Trump entities. $550M+ raised in token sales."},
+  {id:40, title:"Pakistan Integrates USD1 Into National Payment System", pub:"Pakistani government / Press", date:"Jan 2026", url:"", cat:"govt", thread:"Crypto / WLFI", finding:"Pakistan signed agreement with WLF affiliate to integrate USD1 into national digital payment system for cross-border transactions. Same month WLF filed for U.S. national banking charter."},
+
+  // KUSHNER / AFFINITY
+  {id:41, title:"Affinity Partners AUM Surges to $6.2B — Bloomberg", pub:"Bloomberg", date:"Mar 2026", url:"", cat:"press", thread:"Affinity / Kushner", finding:"Affinity assets grew to $6.2B at end of 2025 — nearly 30% growth in one year. 99% of funding from foreign nationals including Saudi, UAE, and Qatari sovereign wealth funds."},
+  {id:42, title:"Senate Finance / House Oversight Letters — Kushner Conflict of Interest", pub:"Senate Finance Committee / House Oversight", date:"Mar 2026", url:"", cat:"govt", thread:"Affinity / Kushner", finding:"Wyden and Rep. Garcia demanded answers about Kushner soliciting Gulf sovereign wealth while co-leading Trump administration negotiations in the same region — including Iran ceasefire."},
+  {id:43, title:"Rep. Raskin House Judiciary Letter — Affinity Partners Investigation", pub:"House Judiciary / Rep. Raskin", date:"Apr 17, 2026", url:"", cat:"govt", thread:"Affinity / Kushner", finding:"Raskin: 99% foreign funding confirmed. Affinity returned $0 in profits to investors by 2024 while collecting $157M in management fees. Affinity collected $87M directly from Saudi government."},
+
+  // EPSTEIN / UFO
+  {id:44, title:"DOJ Releases First Epstein File Batch — Heavily Redacted", pub:"DOJ / Epstein Files Transparency Act", date:"Dec 19, 2025", url:"", cat:"govt", thread:"Epstein / UFO", finding:"First wave released December 19 2025. Heavily redacted. DOJ concluded July 2025 no client list existed and no credible blackmail evidence found — before public release."},
+  {id:45, title:"3 Million+ Epstein Pages, 2,000 Videos, 180K Images — Second Drop", pub:"DOJ", date:"Jan 30, 2026", url:"", cat:"govt", thread:"Epstein / UFO", finding:"Largest single document dump. Released January 30 — six days after Alex Pretti killed, 23 days after Renée Good killed. Two U.S. citizen killings buried under 3M pages."},
+  {id:46, title:"Pentagon UFO Files Released at war.gov/UFO — Modeled on Epstein Template", pub:"Pentagon / DOD", date:"May 8, 2026", url:"", cat:"govt", thread:"Epstein / UFO", finding:"Pentagon released decades of UAP files. Government acknowledged modeling release on Epstein file infrastructure. Expert review called it underwhelming. Released while Iran conflict active and Kushner probe open."},
+];
+
+let selectedIds = new Set();
+let activeFilter = 'all';
+let sources = [...SOURCES];
+
+// ─── RENDER SOURCES ───
+function renderSources(list) {
+  const grid = document.getElementById('srcGrid');
+  const count = document.getElementById('dbCount');
+  count.textContent = `${list.length} source${list.length!==1?'s':''}`;
+  grid.innerHTML = list.map(s => `
+    <div class="src-card${selectedIds.has(s.id)?' selected':''}" onclick="toggleSelect(${s.id})">
+      <div class="src-cat-badge cat-${s.cat}">${catLabel(s.cat)}</div>
+      <div class="src-title">${s.title}</div>
+      <div class="src-pub">${s.pub}</div>
+      <div class="src-date">${s.date}</div>
+      <div class="src-thread">Thread: ${s.thread}</div>
+      ${s.url ? `<a class="src-link" href="${s.url}" target="_blank" onclick="event.stopPropagation()">${s.url.replace('https://','').substring(0,55)}…</a>` : ''}
+      <div style="font-size:0.54rem;color:#777;margin-top:0.5rem;font-style:italic;line-height:1.5;">${s.finding}</div>
+    </div>
+  `).join('');
+}
+
+function catLabel(c){return{court:'Court Filing',press:'Press',govt:'Government',fec:'FEC Record',primary:'Primary Doc',advocacy:'Advocacy'}[c]||c;}
+
+function filterSources() {
+  const q = document.getElementById('dbSearch').value.toLowerCase();
+  let list = sources;
+  if (activeFilter !== 'all') list = list.filter(s => s.thread === activeFilter);
+  if (q) list = list.filter(s =>
+    s.title.toLowerCase().includes(q) ||
+    s.pub.toLowerCase().includes(q) ||
+    s.finding.toLowerCase().includes(q) ||
+    s.thread.toLowerCase().includes(q)
+  );
+  renderSources(list);
+}
+
+function toggleFilter(btn, val) {
+  activeFilter = val;
+  document.querySelectorAll('.db-filter').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  filterSources();
+}
+
+function toggleSelect(id) {
+  if (selectedIds.has(id)) selectedIds.delete(id);
+  else selectedIds.add(id);
+  filterSources();
+  updateSelPanel();
+}
+
+function updateSelPanel() {
+  const tags = document.getElementById('selTags');
+  const cnt = document.getElementById('selCount');
+  const sel = sources.filter(s => selectedIds.has(s.id));
+  cnt.textContent = sel.length;
+  if (!sel.length) {
+    tags.innerHTML = '<span class="sel-empty">No sources selected — go to Source Database tab and click cards to select them</span>';
+    return;
+  }
+  tags.innerHTML = sel.map(s =>
+    `<span class="sel-tag" onclick="toggleSelect(${s.id})" title="Click to remove">${s.pub.substring(0,22)}</span>`
+  ).join('');
+}
+
+// ─── MODAL ───
+function openModal(){document.getElementById('modalOverlay').classList.add('open');}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open');}
+function closeModalOutside(e){if(e.target===document.getElementById('modalOverlay'))closeModal();}
+function saveSource(){
+  const t=document.getElementById('mTitle').value.trim();
+  if(!t){alert('Title required');return;}
+  const ns={
+    id:Date.now(),
+    title:t,
+    pub:document.getElementById('mPub').value||'Unknown',
+    date:document.getElementById('mDate').value||'2026',
+    url:document.getElementById('mUrl').value||'',
+    cat:document.getElementById('mCat').value,
+    thread:document.getElementById('mThread').value,
+    finding:document.getElementById('mFinding').value||''
+  };
+  sources.unshift(ns);
+  ['mTitle','mPub','mDate','mUrl','mFinding'].forEach(id=>document.getElementById(id).value='');
+  closeModal();
+  filterSources();
+  updateStats();
+}
+
+// ─── ARTICLE BUILDER ───
+async function generateArticle() {
+  const sel = sources.filter(s => selectedIds.has(s.id));
+  if (!sel.length) { alert('Select at least one source from the Source Database tab first.'); switchTab('db'); return; }
+
+  const type = document.getElementById('articleType').value;
+  const thread = document.getElementById('articleThread').value;
+  const tone = document.getElementById('articleTone').value;
+  const length = document.getElementById('articleLength').value;
+  const focus = document.getElementById('articleFocus').value;
+
+  const wordTarget = {short:400,medium:800,long:1500}[length];
+  const toneDesc = {
+    investigative:'factual, sourced investigative journalism — let the receipts speak',
+    poast:'P.O.A.S.T. voice — sharp, direct, no-nonsense, uses phrases like "here is your receipt" and "the money does not have a party affiliation," calls out kayfabe',
+    formal:'formal journalism style — AP style, neutral tone, attribution on every claim',
+    accessible:'plain language, accessible to readers without a political background'
+  }[tone];
+
+  const sourceBlock = sel.map((s,i) =>
+    `[${i+1}] ${s.title} — ${s.pub} (${s.date})\nKey finding: ${s.finding}`
+  ).join('\n\n');
+
+  const prompt = `You are writing a Substack investigative article for P.O.A.S.T. (@JimmyHitchcock), an independent investigative journalism publication. The tagline is "Less Noise. More Movement. The People Are The Power."
+
+ARTICLE TYPE: ${type}
+PRIMARY THREAD: ${thread}
+TONE: ${toneDesc}
+TARGET LENGTH: approximately ${wordTarget} words
+CUSTOM FOCUS: ${focus || 'None — cover the thread comprehensively'}
+
+SOURCING STANDARD: P.O.A.S.T. only uses primary documents, court filings, FEC records, named journalism, and government filings. Never Wikipedia as a sole source. Every factual claim must trace to one of the provided sources.
+
+SOURCES TO DRAW FROM:
+${sourceBlock}
+
+ARTICLE REQUIREMENTS:
+1. Start with a headline (use H1 format)
+2. Include a subheadline/deck (1-2 sentences summarizing the core finding)
+3. Include byline: "By Jimmy Hitchcock | P.O.A.S.T."
+4. Write in clear sections with headers
+5. Every key factual claim should reference a source in brackets like [Source: Publication, Date]
+6. End with a "Sources" section listing all sources used
+7. Do NOT fabricate facts — only use what is in the provided sources
+8. Close with a call to action appropriate for Substack (subscribe, share, follow @JimmyHitchcock)
+
+Write the complete article now:`;
+
+  const area = document.getElementById('articleArea');
+  const bar = document.getElementById('loadingBar');
+  bar.style.display = 'block';
+  area.innerHTML = '<div style="padding:2rem;font-size:0.7rem;color:var(--dim);letter-spacing:0.1em;">Generating article from ' + sel.length + ' selected sources...</div>';
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{role:'user', content: prompt}]
+      })
+    });
+    const data = await res.json();
+    const text = data.content?.map(b => b.text||'').join('') || '';
+    bar.style.display = 'none';
+    renderArticle(text, sel);
+  } catch(e) {
+    bar.style.display = 'none';
+    area.innerHTML = `<div style="padding:2rem;color:var(--red);font-size:0.7rem;">Error generating article: ${e.message}<br><br><span style="color:var(--dim)">Check that you are connected to the internet and logged in to Claude.</span></div>`;
+  }
+}
+
+function renderArticle(text, sel) {
+  const area = document.getElementById('articleArea');
+  // Convert markdown-ish to HTML
+  let html = text
+    .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^### (.+)$/gm, '<h3 style="font-family:var(--mono);font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--dim);margin:1rem 0 0.5rem;">$1</h3>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/^By (.+)$/gm, '<div class="byline">By $1</div>')
+    .replace(/^\> (.+)$/gm, '<div class="deck">$1</div>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/^(?!<)/gm, '');
+
+  area.innerHTML = `<div class="article-output"><p>${html}</p></div>`;
+  // Store raw for copy
+  area.dataset.raw = text;
+}
+
+function copyArticle() {
+  const raw = document.getElementById('articleArea').dataset.raw;
+  if (!raw) { alert('Generate an article first.'); return; }
+  navigator.clipboard.writeText(raw).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy for Substack'; btn.classList.remove('copied'); }, 2500);
+  });
+}
+
+// ─── STATS ───
+function updateStats() {
+  const grid = document.getElementById('statsGrid');
+  const threads = {};
+  sources.forEach(s => { threads[s.thread] = (threads[s.thread]||0)+1; });
+  const cats = {};
+  sources.forEach(s => { cats[s.cat] = (cats[s.cat]||0)+1; });
+
+  grid.innerHTML = `
+    <div class="stat-card"><div class="stat-big">${sources.length}</div><div class="stat-lbl">Total Sources</div></div>
+    <div class="stat-card"><div class="stat-big">${selectedIds.size}</div><div class="stat-lbl">Currently Selected</div></div>
+    <div class="stat-card"><div class="stat-big">${cats.court||0}</div><div class="stat-lbl">Court Filings</div></div>
+    <div class="stat-card"><div class="stat-big">${cats.press||0}</div><div class="stat-lbl">Press Sources</div></div>
+    <div class="stat-card"><div class="stat-big">${cats.govt||0}</div><div class="stat-lbl">Government Docs</div></div>
+    <div class="stat-card"><div class="stat-big">${cats.fec||0}</div><div class="stat-lbl">FEC Records</div></div>
+    <div class="stat-card"><div class="stat-big">${cats.primary||0}</div><div class="stat-lbl">Primary Documents</div></div>
+    <div class="stat-card"><div class="stat-big">${cats.advocacy||0}</div><div class="stat-lbl">Watchdog / Advocacy</div></div>
+  `;
+
+  const max = Math.max(...Object.values(threads));
+  const tl = document.getElementById('threadList');
+  tl.innerHTML = Object.entries(threads).sort((a,b)=>b[1]-a[1]).map(([name,cnt]) => `
+    <div class="thread-item">
+      <div class="thread-name">${name}</div>
+      <div class="thread-bar"><div class="thread-fill" style="width:${(cnt/max*100)}%"></div></div>
+      <div class="thread-count">${cnt}</div>
+    </div>
+  `).join('');
+}
+
+// ─── TABS ───
+function switchTab(id) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  document.querySelectorAll('.tab')[['db','builder','stats'].indexOf(id)].classList.add('active');
+  if(id==='stats') updateStats();
+  if(id==='builder') updateSelPanel();
+}
+
+// ─── EXPORT ───
+function exportSources() {
+  const rows = ['ID,Title,Publication,Date,Category,Thread,URL,Key Finding'];
+  sources.forEach(s => {
+    rows.push([s.id,`"${s.title}"`,`"${s.pub}"`,s.date,s.cat,s.thread,s.url,`"${s.finding}"`].join(','));
+  });
+  const blob = new Blob([rows.join('\n')], {type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'poast-sources.csv';
+  a.click();
+}
+
+// ─── INIT ───
+renderSources(sources);
+updateStats();
+</script>
+</body>
+</html>

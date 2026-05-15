@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>P.O.A.S.T. — ICE Infrastructure Canvas</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@300;400;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #070707;
+  --dark: #0f0f0f;
+  --panel: #121212;
+  --panel2: #161616;
+  --border: #1e1e1e;
+  --border-lit: #282828;
+  --off-white: #e6e1d5;
+  --dim: #777770;
+  --gold: #c8a84b;
+  --gold-dim: #7a6428;
+  --gold-glow: rgba(200,168,75,0.08);
+  --red: #bf3a2b;
+  --red-bright: #e84535;
+  --red-dim: #5c1a13;
+  --red-glow: rgba(191,58,43,0.1);
+  --blue: #2e7fb8;
+  --blue-dim: #1a4a6e;
+  --green: #1a8a5a;
+  --green-dim: #0d4a2e;
+  --mono: 'IBM Plex Mono', monospace;
+  --serif: 'Libre Baskerville', Georgia, serif;
+  --display: 'Bebas Neue', sans-serif;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--off-white);
+  font-family: var(--mono);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* grain overlay */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9000;
+}
+
+/* ── MASTHEAD ── */
+.masthead {
+  position: sticky; top: 0; z-index: 500;
+  background: var(--black);
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 1.5rem;
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+}
+.logo { font-family: var(--display); font-size: 1.9rem; letter-spacing: 0.15em; color: var(--gold); text-shadow: 0 0 24px rgba(200,168,75,0.25); line-height: 1; }
+.logo-sub { font-size: 0.5rem; color: var(--gold-dim); letter-spacing: 0.22em; text-transform: uppercase; margin-top: 0.1rem; }
+.series-badge { font-family: var(--mono); font-size: 0.52rem; letter-spacing: 0.18em; text-transform: uppercase; padding: 0.3rem 0.7rem; border: 1px solid var(--red-dim); color: var(--red-bright); background: rgba(191,58,43,0.06); }
+
+/* ── HERO ── */
+.hero {
+  padding: 3rem 1.5rem 2rem;
+  border-bottom: 1px solid var(--border);
+  position: relative; overflow: hidden;
+}
+.hero::before {
+  content: 'ICE';
+  position: absolute; right: -1.5rem; top: 50%; transform: translateY(-50%);
+  font-family: var(--display); font-size: clamp(8rem,22vw,18rem);
+  color: rgba(191,58,43,0.04); letter-spacing: 0.1em; pointer-events: none; line-height: 1;
+}
+.hero-eyebrow { font-size: 0.58rem; letter-spacing: 0.28em; color: var(--red); text-transform: uppercase; margin-bottom: 0.9rem; }
+.hero h1 { font-family: var(--display); font-size: clamp(2.2rem,6vw,5.5rem); line-height: 0.9; letter-spacing: 0.04em; color: var(--off-white); max-width: 740px; }
+.hero h1 span { color: var(--red-bright); display: block; }
+.hero-deck { font-family: var(--serif); font-size: 0.88rem; line-height: 1.75; color: var(--dim); max-width: 600px; margin-top: 1.2rem; }
+.hero-deck strong { color: var(--off-white); }
+
+/* ── TOLL COUNTER ── */
+.toll {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(130px,1fr));
+  background: var(--dark); border-bottom: 1px solid var(--border);
+}
+.toll-cell { padding: 1.1rem 1.4rem; border-right: 1px solid var(--border); }
+.toll-cell:last-child { border-right: none; }
+.toll-n { font-family: var(--display); font-size: 2.4rem; line-height: 1; margin-bottom: 0.25rem; }
+.toll-n.r { color: var(--red-bright); text-shadow: 0 0 20px rgba(191,58,43,0.25); }
+.toll-n.g { color: var(--gold); }
+.toll-n.w { color: var(--off-white); }
+.toll-d { font-size: 0.5rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--dim); line-height: 1.5; }
+.toll-s { font-size: 0.46rem; letter-spacing: 0.1em; color: var(--gold-dim); margin-top: 0.35rem; }
+
+/* ── NAV ── */
+.canvas-nav {
+  padding: 0.6rem 1.5rem; border-bottom: 1px solid var(--border);
+  display: flex; gap: 0.35rem; flex-wrap: wrap; background: var(--panel);
+}
+.cnav { font-size: 0.5rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 0.22rem 0.55rem; border: 1px solid var(--border-lit); color: var(--dim); cursor: pointer; text-decoration: none; transition: all 0.18s; }
+.cnav:hover, .cnav.active { border-color: var(--red-dim); color: var(--red-bright); background: var(--red-glow); }
+
+/* ── SECTION ── */
+.sec { border-bottom: 1px solid var(--border); }
+.sec-hd {
+  padding: 1.1rem 1.5rem; display: flex; align-items: center; gap: 1rem;
+  cursor: pointer; transition: background 0.18s; user-select: none;
+  border-bottom: 1px solid transparent;
+}
+.sec-hd:hover { background: rgba(255,255,255,0.015); }
+.sec-hd.open { border-bottom-color: var(--border); }
+.sec-num { font-family: var(--display); font-size: 2.8rem; color: var(--border-lit); line-height: 1; min-width: 2.8rem; }
+.sec-meta { flex: 1; }
+.sec-cat { font-size: 0.5rem; letter-spacing: 0.25em; color: var(--dim); text-transform: uppercase; margin-bottom: 0.15rem; }
+.sec-title { font-family: var(--display); font-size: clamp(1.1rem,2.5vw,1.9rem); letter-spacing: 0.06em; color: var(--off-white); line-height: 1; }
+.sec-toggle { font-size: 0.65rem; color: var(--red-dim); transition: transform 0.25s; }
+.sec-toggle.open { transform: rotate(180deg); color: var(--red); }
+.sec-body { display: none; }
+.sec-body.open { display: block; }
+
+/* ── FINDING ── */
+.finding {
+  display: grid; grid-template-columns: 1fr 130px; gap: 1rem;
+  padding: 1.1rem 1.5rem; border-bottom: 1px solid #131313;
+  transition: background 0.15s;
+}
+.finding:hover { background: rgba(255,255,255,0.012); }
+.finding:last-child { border-bottom: none; }
+.ftag {
+  display: inline-block; font-size: 0.48rem; letter-spacing: 0.18em; text-transform: uppercase;
+  padding: 0.13rem 0.38rem; border: 1px solid; margin-bottom: 0.5rem;
+}
+.ftag.confirmed { color: var(--green); border-color: var(--green-dim); }
+.ftag.critical { color: var(--red-bright); border-color: var(--red-dim); }
+.ftag.resigned { color: var(--gold); border-color: var(--gold-dim); }
+.ftag.suppressed { color: #9b59b6; border-color: #5b2d7a; }
+.ftag.unverified { color: var(--dim); border-color: var(--border-lit); }
+.ftag.homicide { color: var(--red-bright); border-color: var(--red-dim); background: rgba(191,58,43,0.08); }
+.ftext { font-family: var(--serif); font-size: 0.86rem; line-height: 1.75; color: #ccc8bc; }
+.ftext strong { color: var(--off-white); font-weight: 700; }
+.ftext em { color: var(--red-bright); font-style: italic; }
+.ftext .gold { color: var(--gold); font-weight: 700; }
+.fsrc { display: flex; flex-direction: column; align-items: flex-end; gap: 0.3rem; }
+.sbadge {
+  font-size: 0.46rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--dim); background: var(--dark); border: 1px solid var(--border);
+  padding: 0.18rem 0.38rem; text-align: right; word-break: break-word; hyphens: auto;
+  text-decoration: none; display: block; max-width: 128px;
+  transition: all 0.18s;
+}
+.sbadge:hover { color: var(--red); border-color: var(--red-dim); }
+
+/* ── STAT STRIP ── */
+.sstrip {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr));
+  border-bottom: 1px solid var(--border); background: var(--panel);
+}
+.scell { padding: 1rem 1.3rem; border-right: 1px solid var(--border); }
+.scell:last-child { border-right: none; }
+.sn { font-family: var(--display); font-size: 2rem; line-height: 1; margin-bottom: 0.2rem; }
+.sn.r { color: var(--red-bright); }
+.sn.g { color: var(--gold); }
+.sn.w { color: var(--off-white); }
+.sd { font-size: 0.48rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--dim); line-height: 1.5; }
+.ss { font-size: 0.44rem; letter-spacing: 0.1em; color: var(--gold-dim); margin-top: 0.3rem; }
+
+/* ── TIMELINE BLOCK ── */
+.timeline { }
+.tevent { display: grid; grid-template-columns: 100px 1fr; border-bottom: 1px solid #101010; }
+.tevent:last-child { border-bottom: none; }
+.tdate { padding: 0.9rem 0.8rem 0.9rem 1.5rem; border-right: 1px solid var(--border); background: var(--panel); display: flex; flex-direction: column; justify-content: flex-start; }
+.tdate-main { font-family: var(--display); font-size: 0.85rem; color: var(--red-bright); line-height: 1.2; letter-spacing: 0.04em; }
+.tdate-sub { font-size: 0.44rem; letter-spacing: 0.12em; color: var(--dim); text-transform: uppercase; margin-top: 0.2rem; }
+.tcontent { padding: 0.9rem 1.5rem; }
+.thead { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--off-white); margin-bottom: 0.4rem; }
+.tbody { font-family: var(--serif); font-size: 0.82rem; line-height: 1.65; color: #999; }
+.tbody strong { color: var(--off-white); }
+.tbody em { color: var(--red-bright); font-style: italic; }
+.tflag { display: inline-block; font-size: 0.44rem; letter-spacing: 0.14em; text-transform: uppercase; padding: 0.1rem 0.32rem; border: 1px solid; margin-top: 0.45rem; }
+.tflag.r { color: var(--red-bright); border-color: var(--red-dim); }
+.tflag.g { color: var(--gold); border-color: var(--gold-dim); }
+.tflag.p { color: #9b59b6; border-color: #5b2d7a; }
+
+/* ── ACTOR CARDS ── */
+.agrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px,1fr)); gap: 1px; background: var(--border); }
+.acard { background: var(--panel); padding: 1.2rem 1.4rem; }
+.aname { font-family: var(--display); font-size: 1.2rem; letter-spacing: 0.08em; color: var(--off-white); line-height: 1.1; margin-bottom: 0.15rem; }
+.arole { font-size: 0.5rem; letter-spacing: 0.16em; color: var(--red); text-transform: uppercase; margin-bottom: 0.7rem; }
+.anotes { font-family: var(--serif); font-size: 0.8rem; line-height: 1.65; color: #999; }
+.anotes strong { color: var(--gold); font-weight: 700; }
+.anotes em { color: var(--red-bright); font-style: italic; }
+.alinks { margin-top: 0.7rem; display: flex; flex-direction: column; gap: 0.25rem; }
+.alink { font-size: 0.48rem; letter-spacing: 0.1em; color: var(--gold-dim); text-transform: uppercase; }
+.alink::before { content: '→ '; }
+
+/* ── RENEE GOOD FEATURE ── */
+.good-feature {
+  background: linear-gradient(135deg, rgba(191,58,43,0.09) 0%, transparent 70%);
+  border-left: 4px solid var(--red);
+  padding: 0; overflow: hidden;
+}
+.good-header {
+  padding: 1.5rem 1.5rem 0.8rem;
+  border-bottom: 1px solid var(--red-dim);
+}
+.good-name { font-family: var(--display); font-size: clamp(2rem,5vw,4rem); letter-spacing: 0.05em; color: var(--red-bright); line-height: 1; }
+.good-sub { font-size: 0.55rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--dim); margin-top: 0.3rem; }
+.good-body { padding: 0 1.5rem 1.5rem; }
+.good-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 1px; background: var(--red-dim); margin: 1rem 0; }
+.gfact { background: rgba(10,5,5,0.95); padding: 0.9rem 1.1rem; }
+.gfact-label { font-size: 0.48rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--red); margin-bottom: 0.35rem; }
+.gfact-val { font-family: var(--serif); font-size: 0.85rem; line-height: 1.6; color: var(--off-white); }
+.gfact-val strong { color: var(--red-bright); font-weight: 700; }
+
+/* ── QUOTE ── */
+.qblock {
+  padding: 1.5rem 1.5rem 1.5rem 3.5rem;
+  border-bottom: 1px solid var(--border);
+  background: rgba(200,168,75,0.03);
+  border-left: 3px solid var(--gold-dim);
+  position: relative;
+}
+.qblock::before { content: '"'; font-family: var(--display); font-size: 4.5rem; color: var(--gold-dim); position: absolute; left: 0.9rem; top: 0.6rem; line-height: 1; opacity: 0.5; }
+.qtext { font-family: var(--serif); font-size: 0.92rem; font-style: italic; line-height: 1.75; color: var(--off-white); max-width: 640px; }
+.qattr { font-size: 0.52rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold-dim); margin-top: 0.7rem; }
+
+/* ── RESIGNATION TRACKER ── */
+.resign-track { padding: 1rem 1.5rem; }
+.resign-row { display: grid; grid-template-columns: 180px 1fr; gap: 1rem; padding: 0.7rem 0; border-bottom: 1px solid #111; align-items: start; }
+.resign-row:last-child { border-bottom: none; }
+.resign-who { font-size: 0.65rem; letter-spacing: 0.05em; color: var(--off-white); }
+.resign-why { font-family: var(--serif); font-size: 0.8rem; line-height: 1.6; color: #888; }
+.resign-why strong { color: var(--red-bright); font-weight: 700; }
+
+/* ── INFRASTRUCTURE MAP ── */
+.infra { padding: 1rem 1.5rem; display: flex; flex-direction: column; gap: 0; }
+.infra-row {
+  display: grid; grid-template-columns: 160px 1fr;
+  border-bottom: 1px solid #111; padding: 0.9rem 0;
+}
+.infra-row:last-child { border-bottom: none; }
+.infra-entity { font-family: var(--display); font-size: 0.9rem; letter-spacing: 0.06em; color: var(--off-white); line-height: 1.2; padding-right: 1rem; border-right: 1px solid var(--border); }
+.infra-role { font-size: 0.48rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); margin-top: 0.15rem; }
+.infra-detail { padding-left: 1rem; font-family: var(--serif); font-size: 0.82rem; line-height: 1.65; color: #888; }
+.infra-detail strong { color: var(--gold); font-weight: 700; }
+.infra-detail em { color: var(--red-bright); }
+
+/* ── KAYFABE BOX ── */
+.kb { padding: 1.5rem; margin: 0; border-bottom: 1px solid var(--border); }
+.kb.red { background: linear-gradient(135deg, rgba(191,58,43,0.07) 0%, transparent 100%); border-left: 3px solid var(--red-dim); }
+.kb.gold { background: linear-gradient(135deg, rgba(200,168,75,0.05) 0%, transparent 100%); border-left: 3px solid var(--gold-dim); }
+.kb-label { font-size: 0.52rem; letter-spacing: 0.28em; text-transform: uppercase; margin-bottom: 0.7rem; }
+.kb.red .kb-label { color: var(--red); }
+.kb.gold .kb-label { color: var(--gold); }
+.kb-text { font-family: var(--serif); font-size: 0.93rem; line-height: 1.8; color: var(--off-white); max-width: 720px; }
+.kb-text strong { color: var(--red-bright); font-weight: 700; }
+.kb-text .gold { color: var(--gold); font-weight: 700; }
+
+/* ── FOOTER ── */
+.footer { padding: 2rem 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; border-top: 1px solid var(--border); }
+.footer-logo { font-family: var(--display); font-size: 3.5rem; color: var(--red-bright); letter-spacing: 0.3em; text-shadow: 0 0 40px rgba(191,58,43,0.2); }
+.footer-r { text-align: right; }
+.footer-line { font-size: 0.52rem; letter-spacing: 0.18em; color: var(--dim); text-transform: uppercase; line-height: 2; }
+.footer-line.gold { color: var(--gold-dim); }
+
+/* ── SEARCH ── */
+.searchbar { padding: 0.7rem 1.5rem; background: var(--dark); border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.8rem; }
+.slabel { font-size: 0.52rem; letter-spacing: 0.2em; color: var(--red-dim); text-transform: uppercase; white-space: nowrap; }
+.sinput { flex: 1; background: transparent; border: none; border-bottom: 1px solid var(--border-lit); color: var(--off-white); font-family: var(--mono); font-size: 0.72rem; padding: 0.18rem 0; outline: none; letter-spacing: 0.05em; }
+.sinput::placeholder { color: var(--dim); }
+.sinput:focus { border-bottom-color: var(--red-dim); }
+.scount { font-size: 0.48rem; letter-spacing: 0.12em; color: var(--dim); white-space: nowrap; }
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.sec { animation: fadeUp 0.55s ease both; animation-delay: calc(var(--i,0) * 0.06s); }
+
+@media(max-width: 580px) {
+  .finding { grid-template-columns: 1fr; }
+  .fsrc { align-items: flex-start; }
+  .tevent { grid-template-columns: 78px 1fr; }
+  .resign-row { grid-template-columns: 1fr; }
+  .infra-row { grid-template-columns: 1fr; }
+  .infra-entity { border-right: none; border-bottom: 1px solid var(--border); padding-right: 0; padding-bottom: 0.4rem; }
+  .infra-detail { padding-left: 0; padding-top: 0.4rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- MASTHEAD -->
+<header class="masthead">
+  <div>
+    <div class="logo">P.O.A.S.T.</div>
+    <div class="logo-sub">The People Are The Power — Less Noise. More Movement.</div>
+  </div>
+  <div class="series-badge">ICE Detention Canvas // May 2026</div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-eyebrow">▶ P.O.A.S.T. Investigative Canvas — Full Series</div>
+  <h1>DETAIN.<span>PROFIT. SUPPRESS.</span></h1>
+  <div class="hero-deck">
+    The ICE detention system is not a law enforcement apparatus. It is a <strong>revenue infrastructure</strong> — built on collapsed medical payments, no-bid contracts, political access, congressional capture, and the burial of a U.S. citizen's killing. Every actor in this chain benefits. Only the detainees die.
+  </div>
+</div>
+
+<!-- TOLL COUNTER -->
+<div class="toll">
+  <div class="toll-cell"><div class="toll-n r">38+</div><div class="toll-d">Deaths in ICE custody 2025–Feb 2026</div><div class="toll-s">// The Appeal / Andrew Free</div></div>
+  <div class="toll-cell"><div class="toll-n r">71%</div><div class="toll-d">Of deaths in for-profit facilities</div><div class="toll-s">// The Appeal, Feb 2026</div></div>
+  <div class="toll-cell"><div class="toll-n r">5x</div><div class="toll-d">Historical death rate since Oct 3 payment stop</div><div class="toll-s">// Popular Information</div></div>
+  <div class="toll-cell"><div class="toll-n g">68K</div><div class="toll-d">Detained Feb 2026 (was 40K Jan 2025)</div><div class="toll-s">// DHS figures</div></div>
+  <div class="toll-cell"><div class="toll-n r">49</div><div class="toll-d">Detention standard violations — Camp East Montana</div><div class="toll-s">// ICE's own oversight unit</div></div>
+  <div class="toll-cell"><div class="toll-n r">15+</div><div class="toll-d">Federal prosecutors resigned over Good case</div><div class="toll-s">// NYT / CBS News</div></div>
+</div>
+
+<!-- NAV -->
+<nav class="canvas-nav">
+  <a class="cnav active" href="#collapse">Payment Collapse</a>
+  <a class="cnav" href="#renee">Renée Good</a>
+  <a class="cnav" href="#camp">Camp East Montana</a>
+  <a class="cnav" href="#infra">Infrastructure Map</a>
+  <a class="cnav" href="#cbci">CBCI Capture</a>
+  <a class="cnav" href="#actors">Actors</a>
+  <a class="cnav" href="#resignations">Resignations</a>
+  <a class="cnav" href="#kayfabe">Kayfabe Frame</a>
+</nav>
+
+<!-- SEARCH -->
+<div class="searchbar">
+  <span class="slabel">// Search canvas</span>
+  <input class="sinput" type="text" id="si" placeholder="Name, entity, date, case number..." oninput="doSearch()">
+  <span class="scount" id="sc">All findings shown</span>
+</div>
+
+<!-- ══════════════════════ SECTION 1 — PAYMENT COLLAPSE ══════════════════════ -->
+<div class="sec" id="collapse" style="--i:0">
+  <div class="sec-hd open" onclick="tog(this)">
+    <div class="sec-num">01</div>
+    <div class="sec-meta">
+      <div class="sec-cat">// The structural trigger</div>
+      <div class="sec-title">THE MEDICAL PAYMENT COLLAPSE CHAIN</div>
+    </div>
+    <div class="sec-toggle open">▲</div>
+  </div>
+  <div class="sec-body open">
+    <div class="sstrip">
+      <div class="scell"><div class="sn r">Oct 3</div><div class="sd">VA billing terminated — 20-year agreement ended in 3 days</div><div class="ss">// Popular Information</div></div>
+      <div class="scell"><div class="sn r">$0</div><div class="sd">Payments to outside providers since Oct 3, 2025</div><div class="ss">// Anonymous DHS source</div></div>
+      <div class="scell"><div class="sn g">Apr 30</div><div class="sd">Acentra Health's promised restart date — missed</div><div class="ss">// Acentra website</div></div>
+      <div class="scell"><div class="sn r">7mo+</div><div class="sd">Length of medical payment gap as of May 2026</div><div class="ss">// P.O.A.S.T. calculation</div></div>
+    </div>
+
+    <div class="finding">
+      <div>
+        <div class="ftag confirmed">Confirmed</div>
+        <div class="ftext"><strong>September 30, 2025:</strong> CASA (Center to Advance Security in America) files a FOIA lawsuit against the DOJ targeting the VA's role processing ICE medical billing. CASA's Director of Research and Policy, <strong>Curtis Schube</strong>, came directly from <strong>Dhillon Law Group</strong>. The lawsuit is represented by Dhillon Law Group, Inc. — the same firm Schube came from, whose principal Harmeet Dhillon was simultaneously awaiting Senate confirmation as Assistant Attorney General for Civil Rights.</div>
+      </div>
+      <div class="fsrc">
+        <span class="sbadge">Case No.<br>1:25-cv-03970</span>
+        <span class="sbadge">CASA founding<br>documents</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div>
+        <div class="ftag critical">Critical</div>
+        <div class="ftext"><strong>October 3, 2025 — three days later:</strong> The VA "abruptly and instantly terminated" its 20-year medical billing agreement with ICE. No transition plan existed. Outside providers — hospitals, clinics, pharmacies — began receiving instructions to <em>"hold all claims submissions."</em> An anonymous Trump administration source confirmed to Popular Information: <strong>"ICE's failure to pay its bills for months has caused some medical providers to deny services to ICE detainees."</strong> The death rate immediately begins accelerating.</div>
+      </div>
+      <div class="fsrc">
+        <span class="sbadge">Popular<br>Information</span>
+        <span class="sbadge">Public Citizen<br>Apr 2026</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div>
+        <div class="ftag critical">Critical</div>
+        <div class="ftext"><strong>Acentra Health</strong> — the private contractor brought in to replace the VA billing system — was contractually required to resume provider payments by <strong>April 30, 2026</strong>. April 30 came and went with no payments. Acentra quietly updated their website pushing the restart to "second quarter 2026." As of May 2026, the medical payment gap has lasted <strong>over seven months</strong>. ICE leadership issued internal communications calling it an "absolute emergency" — then did nothing for months.</div>
+      </div>
+      <div class="fsrc">
+        <span class="sbadge">Acentra Health<br>website (updated)</span>
+        <span class="sbadge">Popular<br>Information</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div>
+        <div class="ftag confirmed">Confirmed</div>
+        <div class="ftext"><strong>GEO Group</strong> operates approximately 50 prisons and correctional facilities with more than 60,000 beds nationwide. <strong>CoreCivic</strong> runs more than 40 prisons with ICE contracts exceeding $2 billion. Both are publicly traded — largest shareholders include <span class="gold">BlackRock, Vanguard, and State Street</span> through index funds. 71% of all ICE deaths from 2025 through February 2026 occurred in for-profit facilities. Meanwhile GEO Group posted Q2 2025 revenue of <span class="gold">$636.2 million</span> — a 5% year-over-year increase — and secured four new ICE facility contracts.</div>
+      </div>
+      <div class="fsrc">
+        <span class="sbadge">The Appeal<br>Feb 2026</span>
+        <span class="sbadge">GEO Q2 2025<br>earnings</span>
+        <span class="sbadge">Brennan Center<br>Oct 2025</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div>
+        <div class="ftag confirmed">Confirmed</div>
+        <div class="ftext">At <strong>North Lake Processing Center</strong> (Michigan, GEO Group-operated), facility staff called emergency services more than <strong>50 times</strong> in the last three months of 2025 alone. Immigration lawyers reported clients being denied medication for chronic conditions including insulin for diabetic detainees. At Camp East Montana, one-third of detainees have a chronic illness and approximately 200–300 need daily insulin — per Rep. Veronica Escobar's documented findings.</div>
+      </div>
+      <div class="fsrc">
+        <span class="sbadge">Detroit News</span>
+        <span class="sbadge">Rep. Escobar<br>statement</span>
+        <span class="sbadge">Scripps News</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ SECTION 2 — RENÉE GOOD ══════════════════════ -->
+<div class="sec" id="renee" style="--i:1">
+  <div class="sec-hd" onclick="tog(this)">
+    <div class="sec-num">02</div>
+    <div class="sec-meta">
+      <div class="sec-cat">// U.S. citizen killed — investigation blocked</div>
+      <div class="sec-title">THE KILLING OF RENÉE NICOLE GOOD</div>
+    </div>
+    <div class="sec-toggle">▼</div>
+  </div>
+  <div class="sec-body">
+
+    <div class="good-feature">
+      <div class="good-header">
+        <div class="good-name">RENÉE NICOLE MACKLIN GOOD</div>
+        <div class="good-sub">37 years old · U.S. Citizen · Mother · Wife · Minneapolis, Minnesota · January 7, 2026</div>
+      </div>
+      <div class="good-body">
+        <div class="good-facts">
+          <div class="gfact">
+            <div class="gfact-label">The Shooting</div>
+            <div class="gfact-val">ICE agent <strong>Jonathan Ross</strong>, 43, approached Good's vehicle during Operation Metro Surge — DHS's deployment of 2,000 agents to the Twin Cities. Good's car was stopped sideways in the street. Ross circled the vehicle on foot. An agent reached through her open window, ordering her out. Good briefly reversed, then moved forward. Ross fired <strong>three shots</strong> — first into her windshield, then at close range through the open driver's side window. Video shows Ross was standing out of the vehicle's path when he opened fire.</div>
+          </div>
+          <div class="gfact">
+            <div class="gfact-label">Autopsy Findings</div>
+            <div class="gfact-val">Family-commissioned autopsy found <strong>three clear gunshot wounds plus a graze</strong>: one to her head (fatal), one to her left forearm, one to her right breast. The head wound killed her. U of Minnesota law professor Emmanuel Mauleon reviewed video and called it <strong>"egregious and reckless conduct"</strong> — noting Ross fired so rapidly he nearly shot his own colleague who was standing at Good's door.</div>
+          </div>
+          <div class="gfact">
+            <div class="gfact-label">DHS Use-of-Force Policy</div>
+            <div class="gfact-val">DHS's own use-of-force policy, <strong>updated 2023</strong>, specifically discourages shooting at moving vehicles. Policy requires force to be "objectively reasonable" and states deadly force should only be used when officers face "an immediate threat of significant physical harm" after all other alternatives have been exhausted. Multiple video angles show Good's vehicle was moving <em>away</em> from Ross when he fired.</div>
+          </div>
+          <div class="gfact">
+            <div class="gfact-label">Medical Access Denied</div>
+            <div class="gfact-val">Bystanders including a man who identified himself as a doctor attempted to reach Good after the shooting. <strong>ICE agents stopped them from rendering aid.</strong> Neighbors demanded immediate medical care. Firefighters eventually removed Good from the vehicle. She was transported to Hennepin County Medical Center where she later died.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div>
+        <div class="ftag suppressed">Investigation Suppressed</div>
+        <div class="ftext">Less than three hours after the shooting, <strong>DHS tweeted</strong> that Good had "weaponized her vehicle" and "attempt[ed] to run over our law enforcement officers in an attempt to kill them" — with <em>no investigation whatsoever</em> completed. President Trump publicly declared the agent did nothing wrong. Deputy AG <strong>Todd Blanche</strong> stated on Fox News Sunday the DOJ would not open a criminal investigation: <em>"everybody can watch the videos and see that [Ross] got attacked with a car."</em> Videos show the opposite.</div>
+      </div>
+      <div class="fsrc">
+        <span class="sbadge">CBS News<br>Jan 10 2026</span>
+        <span class="sbadge">Fox News Sunday<br>Jan 13 2026</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div>
+        <div class="ftag critical">Critical — Dhillon Connection</div>
+        <div class="ftext"><strong>Harmeet Dhillon</strong> — as Assistant Attorney General for Civil Rights — made the decision that the DOJ's Civil Rights Division would not open an investigation into whether Good's federal rights had been violated by Ross. This is the same Dhillon whose former law firm employs Curtis Schube, who went to CASA, which filed the lawsuit that collapsed ICE medical billing. The woman who dismantled the medical payment system also blocked the civil rights investigation into the killing of a U.S. citizen.</div>
+      </div>
+      <div class="fsrc">
+        <span class="sbadge">CBS News<br>Jan 10 2026</span>
+        <span class="sbadge">Common Dreams<br>Jan 13 2026</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div>
+        <div class="ftag suppressed">FBI Ordered to Stand Down</div>
+        <div class="ftext">The New York Times reported February 7, 2026 that senior DOJ and FBI officials told career prosecutors at the U.S. Attorney's Office for the District of Minnesota to <strong>stop pursuing a civil rights investigation</strong> into Agent Ross in the days following Good's death. FBI Director <strong>Kash Patel</strong> wanted a warrant to access evidence that would <em>not</em> include language referencing Good as the victim — instead framing her as the subject of an investigation into the assault of a federal officer. <strong>Tracee Mergen</strong>, FBI Minneapolis field office supervisor, resigned January 23 after FBI leadership pushed her to abandon the civil rights inquiry.</div>
+      </div>
+      <div class="fsrc">
+        <span class="sbadge">NYT<br>Feb 7 2026</span>
+        <span class="sbadge">Senators Whitehouse<br>& Durbin letter<br>Mar 4 2026</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div>
+        <div class="ftag suppressed">Investigation Inverted</div>
+        <div class="ftext">Federal investigators were tasked with analyzing any connections Good might have had to <strong>activist groups protesting the Trump administration's immigration policies</strong>. DOJ announced it would probe <strong>Gov. Tim Walz and Minneapolis Mayor Jacob Frey</strong> for alleged conspiracy to impede federal officers. Trump appointee <strong>Daniel N. Rosen</strong>, U.S. attorney for Minnesota, sent an internal email instructing prosecutors to <em>"say nothing"</em> to law enforcement and media about Good's killing — stating only his designees could speak to investigators. The victim became the subject. The agent remained uncharaged.</div>
+      </div>
+      <div class="fsrc">
+        <span class="sbadge">NYT Jan 12 2026</span>
+        <span class="sbadge">Senate Judiciary<br>Committee</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div>
+        <div class="ftag confirmed">Confirmed — Minnesota Sues</div>
+        <div class="ftext">On <strong>March 24, 2026</strong>, the state of Minnesota, Hennepin County, and the Minnesota Bureau of Criminal Apprehension filed suit against both the DOJ and DHS, alleging that the federal defendants were <strong>withholding investigative evidence</strong> about Good's killing, Alex Pretti's killing, and the shooting of Julio Sosa-Celis — in order to shield the federal officers involved. In May 2026, the federal government turned over evidence including copies of Agent Ross's medical examinations, lab results, and mental health evaluations — under court order.</div>
+      </div>
+      <div class="fsrc">
+        <span class="sbadge">Minnesota AG<br>Mar 24 2026</span>
+        <span class="sbadge">Star Tribune<br>May 2026</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div>
+        <div class="ftag critical">Also Jan 24 — Alex Pretti</div>
+        <div class="ftext"><strong>Alex Jeffrey Pretti</strong>, 37, an ICU nurse and U.S. citizen, was fatally shot by a CBP officer in Minneapolis on January 24, 2026 — <em>17 days</em> after Renée Good, less than two miles from the same location. Two U.S. citizens killed by federal agents in 17 days in the same neighborhood. Video evidence contradicts the government's account in Pretti's case as well. Minnesota's March 24 lawsuit covers his killing too. No federal agent has been charged in either case.</div>
+      </div>
+      <div class="fsrc">
+        <span class="sbadge">MN Oversight<br>Report</span>
+        <span class="sbadge">Minnesota AG<br>lawsuit</span>
+      </div>
+    </div>
+
+    <div class="qblock">
+      <div class="qtext">It is highly unusual for the Civil Rights Division not to be involved from the outset with the FBI and U.S. Attorney's office. There is more than enough for DOJ to investigate here. A careful investigation serves an important social good by helping ensure that the rules around the use of force are carefully followed — and signaling to officers that they do not have absolute immunity for criminal conduct.</div>
+      <div class="qattr">— Former DOJ Civil Rights Division Prosecutor, Just Security, Feb 4 2026 (10+ year veteran of the Criminal Section)</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════ SECTION 3 — CAMP EAST MONTANA ══════════════════════ -->
+<div class="sec" id="camp" style="--i:2">
+  <div class="sec-hd" onclick="tog(this)">
+    <div class="sec-num">03</div>
+    <div class="sec-meta">
+      <div class="sec-cat">// Fort Bliss, El Paso, Texas</div>
+      <div class="sec-title">CAMP EAST MONTANA — THE LARGEST INTERNMENT FACILITY IN THE U.S.</div>
+    </div>
+    <div class="sec-toggle">▼</div>
+  </div>
+  <div class="sec-body">
+    <div class="sstrip">
+      <div class="scell"><div class="sn g">$1.3B</div><div class="sd">Contract awarded to Acquisition Logistics LLC</div><div class="ss">// Army contract Jul 2025</div></div>
+      <div class="scell"><div class="sn r">3</div><div class="sd">Detainee deaths in 44-day window</div><div class="ss">// El Paso Matters</div></div>
+      <div class="scell"><div class="sn r">49</div><div class="sd">Detention standard violations per ICE's own inspection</div><div class="ss">// ICE oversight unit</div></div>
+      <div class="scell"><div class="sn r">60</div><div class="sd">Federal standards violated in first 50 days</div><div class="ss">// ICE oversight unit</div></div>
+      <div class="scell"><div class="sn g">8000%</div><div class="sd">How much larger contract was vs. Acq. Logistics' prior biggest deal</div><div class="ss">// Public Citizen</div></div>
+    </div>
+
+    <div class="finding">
+      <div>
+        <div class="ftag confirmed">Confirmed</div>
+        <div class="ftext"><strong>Acquisition Logistics LLC:</strong> headquarters listed at a modest home in suburban Richmond, Virginia, owned by a 77-year-old retired Navy flight officer. Incorporated 2008. No prior detention facility experience. Website was a blank login page at time of award. Classified as veteran-owned, Hispanic-owned SBA small disadvantaged business — qualifying it for restricted bidding. The $1.3 billion contract was <strong>8,000% larger than any contract they had previously managed</strong> and 27 times larger than all their prior contracts combined. Two days after the contract was awarded, a subcontractor employee died at the site.</div>
+      </div>
+      <div class="fsrc">
+        <span class="sbadge">Public Citizen<br>Apr 2026</span>
+        <span class="sbadge">PBS NewsHour<br>Aug 2025</span>
+        <span class="sbadge">Virginia Corp.<br>Commission</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div>
+        <div class="ftag homicide">Homicide Ruled — ICE Called It Suicide</div>
+        <div class="ftext">El Paso County Medical Examiner ruled the death of <strong>Geraldo Lunas Campos</strong> a <em>homicide</em> — cause of death: asphyxia due to neck and torso compression. ICE reported his death as a suicide while in solitary confinement. Witnesses told press that Campos had been <strong>handcuffed and choked by guards before his death</strong>. The body of a second detainee, Victor Manuel Diaz, was transferred to William Beaumont Army Medical Center — under federal jurisdiction — removing it from the local medical examiner's authority. His family called ICE's communication "suspicious and irregular" and launched an independent investigation.</div>
+      </div>
+      <div class="fsrc">
+        <span class="sbadge">El Paso County<br>Medical Examiner</span>
+        <span class="sbadge">El Paso Matters</span>
+        <span class="sbadge">Scripps News</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div>
+        <div class="ftag critical">Subcontractor — Nathan Albers / Disaster Management Group</div>
+        <div class="ftext"><strong>Nathan Albers</strong>, key subcontractor through Disaster Management Group (DMG), previously co-owned <strong>TentLogix</strong> — which pleaded guilty in 2019 to knowingly hiring undocumented workers and concealing them from immigration authorities. Albers signed off on the guilty plea. Company fined $3M+, filed bankruptcy. Albers co-founded DMG with former brother-in-law Gary Hendry — TentLogix's other director at the time of the guilty plea. DOL found DMG violated minimum wage laws on Afghan refugee contracts in 2023 — resulting in <strong>nearly $16 million in back wages</strong>. DMG has received over $500 million in government contracts since 2020.</div>
+      </div>
+      <div class="fsrc">
+        <span class="sbadge">ProPublica<br>Jul 2025</span>
+        <span class="sbadge">DOL investigation<br>2023</span>
+        <span class="sbadge">Court records</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div>
+        <div class="ftag critical">Mar-a-Lago Donor Profiting from Detention</div>
+        <div class="ftext">Nathan Albers donated <strong>$339,218 to Republican candidates</strong> ahead of the 2026 election. Spent election night 2024 at Mar-a-Lago. Co-chaired a charity fundraiser at Trump National Golf Club with Eric Trump and his wife. Attended the "Crypto Ball" — tickets ran $2,500 to $1 million. FEC records show contributions to Trump PACs. Albers now owns a <strong>$30 million home</strong> in Jupiter, Florida — at time of purchase the area's most expensive home. Quote from a former DHS official: <em>"The idea that you could use illegal labor and then sell services to ICE — the irony is thick."</em></div>
+      </div>
+      <div class="fsrc">
+        <span class="sbadge">FEC records</span>
+        <span class="sbadge">ProPublica<br>Jul 2025</span>
+        <span class="sbadge">Scripps News</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div>
+        <div class="ftag confirmed">No-Bid Replacement — Amentum</div>
+        <div class="ftext">After termination, DHS awarded Camp East Montana to <strong>Amentum Services Inc.</strong> on a sole-source, no-bid contract — issued March 11, 2026. Amentum has <strong>112 federal regulatory violations</strong> on record including a 2024 fatal workplace accident in Virginia and a 2023 OSHA citation for exposing workers to toxic vapors at CIA headquarters. Amentum was already a subcontractor under Acquisition Logistics. Public Citizen: <em>"Amentum couldn't even protect the safety and health of federal workers and now they're going to be charged with protecting the safety and health of thousands of immigrant detainees."</em></div>
+      </div>
+      <div class="fsrc">
+        <span class="sbadge">GSA contract<br>database</span>
+        <span class="sbadge">Public Citizen<br>Apr 2026</span>
+        <span class="sbadge">Scripps News</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div>
+        <div class="ftag confirmed">Conditions Documented</div>
+        <div class="ftext">Camp East Montana in its first 50 days: violated at least <strong>60 federal detention standards</strong>. Detainees reported physical and sexual abuse, medical neglect, and intimidation. By December 2025, more than 45 detainees had reported abuse and injuries to their attorneys — including two reports of testicle crushing by guards as punishment. Disease spread: <strong>two cases of tuberculosis and 18 cases of COVID-19</strong> by February 7, 2026. Measles outbreak quarantined the facility February 27, 2026. The ACLU described Camp East Montana as <strong>the largest internment facility in the United States.</strong></div>
+      </div>
+      <div class="fsrc">
+        <span class="sbadge">ACLU</span>
+        <span class="sbadge">Scripps News</span>
+        <span class="sbadge">ICE oversight<br>inspection report</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════ SECTION 4 — INFRASTRUCTURE MAP ══════════════════════ -->
+<div class="sec" id="infra" style="--i:3">
+  <div class="sec-hd" onclick="tog(this)">
+    <div class="sec-num">04</div>
+    <div class="sec-meta">
+      <div class="sec-cat">// Follow the payment chain</div>
+      <div class="sec-title">INFRASTRUCTURE MAP — WHO GETS PAID</div>
+    </div>
+    <div class="sec-toggle">▼</div>
+  </div>
+  <div class="sec-body">
+    <div class="infra">
+
+      <div class="infra-row">
+        <div><div class="infra-entity">VA FINANCIAL SERVICES CENTER</div><div class="infra-role">Former billing processor — 20 years</div></div>
+        <div class="infra-detail">Processed ICE medical billing for two decades. <strong>Terminated October 3, 2025</strong> — three days after CASA's lawsuit. No transition plan. Providers immediately stopped receiving payment authorization. The trigger for the entire collapse.</div>
+      </div>
+
+      <div class="infra-row">
+        <div><div class="infra-entity">ACENTRA HEALTH</div><div class="infra-role">Replacement billing contractor — currently failing</div></div>
+        <div class="infra-detail">Brought in to replace VA. Contractually required to resume payments <strong>April 30, 2026</strong>. Missed deadline. Pushed to "Q2 2026." Still not fully operational as of May 2026. Private contractor receiving government fees to process payments it is not processing while detainees are denied care.</div>
+      </div>
+
+      <div class="infra-row">
+        <div><div class="infra-entity">GEO GROUP (NYSE: GEO)</div><div class="infra-role">Largest ICE contractor — 60,000+ beds</div></div>
+        <div class="infra-detail">$636.2M in Q2 2025 revenue (+5% YoY). Secured four new ICE contracts for ~6,000 beds. Lobbying to force banks to continue financing them after JPMorgan, Wells Fargo cut ties. Board includes <strong>former head of ICE Julie Wood</strong> and former ICE official Matthew Albence. 10 of 13 lobbyists are government revolvers. GEO CEO George Zoley: <em>"unprecedented growth opportunities."</em></div>
+      </div>
+
+      <div class="infra-row">
+        <div><div class="infra-entity">CORECIVIC (NYSE: CXW)</div><div class="infra-role">Second-largest ICE contractor — 40+ facilities</div></div>
+        <div class="infra-detail">$538.2M in Q2 2025 revenue (+10% YoY). $2B+ in ICE contracts. Sued New Jersey to keep operating detention center against state law — federal judge sided with CoreCivic. CEO Damon Hininger called the detention expansion "a pivotal moment." Reopened South Texas Family Residential Center for families including children.</div>
+      </div>
+
+      <div class="infra-row">
+        <div><div class="infra-entity">ACQUISITION LOGISTICS LLC</div><div class="infra-role">Camp East Montana prime contractor — fired</div></div>
+        <div class="infra-detail">Richmond, VA house address. No detention experience. $1.3B contract — 8,000% larger than prior maximum. Failed to register in Texas — a state law violation. Three detainees died. One ruled homicide. Fired March 2026. Still unregistered in Texas when DHS terminated them.</div>
+      </div>
+
+      <div class="infra-row">
+        <div><div class="infra-entity">DISASTER MANAGEMENT GROUP</div><div class="infra-role">Camp East Montana subcontractor</div></div>
+        <div class="infra-detail">Nathan Albers — TentLogix guilty plea (undocumented workers, 2019). $16M DOL back wages (2023). $339K+ Republican donations. Mar-a-Lago access. $30M Jupiter home. <strong>Same company now paid by the government to detain undocumented immigrants.</strong></div>
+      </div>
+
+      <div class="infra-row">
+        <div><div class="infra-entity">AMENTUM SERVICES INC.</div><div class="infra-role">Camp East Montana replacement — no-bid</div></div>
+        <div class="infra-detail">$14B in 2025 revenue. 50,000+ employees in 70+ countries. Formed 2020 as AECOM spinoff, merged with Jacobs Critical Mission Solutions 2024. <strong>112 federal regulatory violations.</strong> Fatal 2024 workplace accident. OSHA citation at CIA headquarters. Was already Acquisition Logistics' subcontractor before receiving the prime contract.</div>
+      </div>
+
+      <div class="infra-row">
+        <div><div class="infra-entity">CITIZENS BANK</div><div class="infra-role">Current GEO Group lender — $550M credit line</div></div>
+        <div class="infra-detail">GEO Group has a $550M line of credit with Citizens Bank. Brown University's graduate union announced April 23, 2026 it would withdraw nearly $500K from Citizens Bank in protest. A coalition sent a formal letter to Citizens Bank CEO Bruce Van Saun demanding the bank end financing ties with CoreCivic and GEO Group — no response received.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ SECTION 5 — CBCI CAPTURE ══════════════════════ -->
+<div class="sec" id="cbci" style="--i:4">
+  <div class="sec-hd" onclick="tog(this)">
+    <div class="sec-num">05</div>
+    <div class="sec-meta">
+      <div class="sec-cat">// Bipartisan capture</div>
+      <div class="sec-title">CONGRESSIONAL BLACK CAUCUS INSTITUTE — CAPTURED</div>
+    </div>
+    <div class="sec-toggle">▼</div>
+  </div>
+  <div class="sec-body">
+
+    <div class="finding">
+      <div>
+        <div class="ftag confirmed">Confirmed — Documented in Annual Report</div>
+        <div class="ftext">The CBCI's <strong>21st Century Council</strong> — a membership-based business council of government relations professionals that meets four times per year — lists top lobbyists from both CoreCivic and GEO Group as <strong>platinum members</strong>. CoreCivic's Managing Director of Government Relations <strong>Jeremy Wiley</strong> is a platinum member. GEO Group's National Director of Legislative and Community Affairs <strong>Emanuel Barr</strong> is also a platinum member. These are the same companies responsible for 71% of ICE detainee deaths.</div>
+      </div>
+      <div class="fsrc">
+        <span class="sbadge">CBCI 2019<br>Annual Report</span>
+        <span class="sbadge">American Prospect<br>Aug 2019</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div>
+        <div class="ftag confirmed">Confirmed — Cash Payments on Record</div>
+        <div class="ftext">CoreCivic disclosed in a House lobbying contribution report that it donated <strong>$25,000 in "honorary expenses"</strong> to the CBCI on April 15, 2019. Listed as honorees: CBCI chair Rep. <strong>Bennie Thompson</strong> (D-MS), CBCI board members Rep. <strong>Jim Clyburn</strong> (D-SC), and <strong>Cedric Richmond</strong> (D-LA). CoreCivic made an identical $25,000 contribution in 2018. Per The Appeal's investigation, Thompson received <strong>$21,000 total</strong> in private prison donations — more than any other sitting member of Congress alongside Rep. Henry Cuellar.</div>
+      </div>
+      <div class="fsrc">
+        <span class="sbadge">House lobbying<br>disclosure</span>
+        <span class="sbadge">The Appeal<br>Feb 2026</span>
+        <span class="sbadge">Prison Legal News<br>Oct 2019</span>
+      </div>
+    </div>
+
+    <div class="finding">
+      <div>
+        <div class="ftag critical">The Contradiction</div>
+        <div class="ftext">The Congressional Black Caucus <em>publicly states</em> that banning private prisons is part of its legislative agenda. It has posted on social media in support of cities ending contracts with CoreCivic and GEO Group. Simultaneously, its affiliated institute accepts their money, seats their lobbyists at the platinum tier of its policy council, and honors its chair and board members at events funded by those same companies. Rep. Thompson — honored at CoreCivic's expense — chairs the <strong>House Committee on Homeland Security</strong>, which has direct oversight authority over ICE and its contracting.</div>
+      </div>
+      <div class="fsrc">
+        <span class="sbadge">CBC official<br>platform</span>
+        <span class="sbadge">American Prospect</span>
+      </div>
+    </div>
+
+    <div class="qblock">
+      <div class="qtext">They are the most invested in maintaining the status quo that's got us to being a country that is leading in the history of the world in incarcerating its own people. It's incredibly disappointing to know that any of the entities affiliated with the Congressional Black Caucus continue to take money from CoreCivic or any other private prison company. There's just no excuse for it.</div>
+      <div class="qattr">— Scott Roberts, Senior Director of Criminal Justice Campaigns, Color of Change — American Prospect, August 2019</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════════════════════ SECTION 6 — KEY ACTORS ══════════════════════ -->
+<div class="sec" id="actors" style="--i:5">
+  <div class="sec-hd" onclick="tog(this)">
+    <div class="sec-num">06</div>
+    <div class="sec-meta">
+      <div class="sec-cat">// Named actors with sourced roles</div>
+      <div class="sec-title">WHO IS IN THE ROOM</div>
+    </div>
+    <div class="sec-toggle">▼</div>
+  </div>
+  <div class="sec-body">
+    <div class="agrid">
+
+      <div class="acard">
+        <div class="aname">HARMEET DHILLON</div>
+        <div class="arole">Asst. AG — Civil Rights Div. (confirmed Apr 3, 2025)</div>
+        <div class="anotes">Founded Dhillon Law Group 2006. Firm employs <strong>Curtis Schube</strong>, who moves to CASA, which files the lawsuit that collapses ICE medical billing. Dhillon Law Group simultaneously represents CASA in the DOJ lawsuit (Case No. 1:25-cv-03970). As AAG: <em>blocks Civil Rights Division investigation into the killing of Renée Good</em>. Tells Civil Rights prosecutors they will not investigate. States the Division's mission is not "woke ideology." Causes mass resignation of career prosecutors.</div>
+        <div class="alinks">
+          <div class="alink">Case No. 1:25-cv-03970</div>
+          <div class="alink">CBS News Jan 10 2026</div>
+          <div class="alink">Common Dreams Jan 13 2026</div>
+        </div>
+      </div>
+
+      <div class="acard">
+        <div class="aname">JONATHAN ROSS</div>
+        <div class="arole">ICE Agent — Shooter in Renée Good case</div>
+        <div class="anotes">43 years old. Iraq War veteran. Fired three shots at Renée Good's vehicle. Videos show he was standing <strong>out of the vehicle's path</strong> when he fired. DHS's own use-of-force policy discourages shooting at moving vehicles. Ross was <strong>never charged</strong>. DHS used Ross's own body camera footage in their self-defense narrative — while bystander footage showed contradictory angles. Mental health evaluations were among evidence ordered turned over under court order May 2026.</div>
+        <div class="alinks">
+          <div class="alink">CNN Jan 17 2026 — video analysis</div>
+          <div class="alink">Star Tribune May 2026</div>
+        </div>
+      </div>
+
+      <div class="acard">
+        <div class="aname">KASH PATEL</div>
+        <div class="arole">FBI Director</div>
+        <div class="anotes">Wanted warrants to access evidence in Good case framed so that <strong>Good was the subject — not the victim</strong>. Senior DOJ and FBI officials under Patel told career prosecutors in Minnesota to stop pursuing the civil rights investigation. FBI Minneapolis field office supervisor <strong>Tracee Mergen</strong> resigned January 23 after Patel's leadership pushed her to abandon the civil rights inquiry. Senators Whitehouse and Durbin demanded IG investigation into Patel's conduct March 4, 2026.</div>
+        <div class="alinks">
+          <div class="alink">NYT Feb 7 2026</div>
+          <div class="alink">Whitehouse-Durbin letter Mar 4 2026</div>
+        </div>
+      </div>
+
+      <div class="acard">
+        <div class="aname">TODD BLANCHE</div>
+        <div class="arole">Deputy Attorney General</div>
+        <div class="anotes">Declared on national television the DOJ would not open a criminal investigation into Jonathan Ross — <em>"everybody can watch the videos and see that [Ross] got attacked."</em> Videos show Good's car moving away from Ross when he fired. Blanche made this declaration before any investigation concluded. Also told CBS News that federal agents "may use deadly force when they face an immediate threat of significant physical harm" — while DHS policy requires exhausting alternatives first.</div>
+        <div class="alinks">
+          <div class="alink">Fox News Sunday Jan 13 2026</div>
+          <div class="alink">CBS News statement</div>
+        </div>
+      </div>
+
+      <div class="acard">
+        <div class="aname">NATHAN ALBERS</div>
+        <div class="arole">CEO — Disaster Management Group / Camp East Montana subcontractor</div>
+        <div class="anotes">Co-owned TentLogix when it pleaded guilty (2019) to hiring undocumented workers — <strong>signed the guilty plea</strong>. Founded DMG with the other TentLogix director. DOL: $16M in unpaid wages (2023). <strong>$339,218 in Republican campaign donations</strong>. Mar-a-Lago election night 2024. Golf with Eric Trump. $30M Jupiter home. Now subcontracting on the largest ICE detention facility in U.S. history. Former DHS official: <em>"The irony is thick."</em></div>
+        <div class="alinks">
+          <div class="alink">ProPublica Jul 2025</div>
+          <div class="alink">FEC records</div>
+          <div class="alink">Court records — TentLogix plea 2019</div>
+        </div>
+      </div>
+
+      <div class="acard">
+        <div class="aname">REP. BENNIE THOMPSON</div>
+        <div class="arole">CBCI Chair / House Homeland Security Chair</div>
+        <div class="anotes">CBCI chair — honored at CoreCivic-funded event, twice ($25K each in 2018 and 2019). Received $21,000 total in private prison donations per The Appeal. Chairs <strong>House Committee on Homeland Security</strong> — direct oversight of ICE and its detention contracting. GEO Group and CoreCivic lobbyists are platinum members of the CBCI's 21st Century Council he chairs. The oversight chairman is a paid honoree of the companies he is supposed to oversee.</div>
+        <div class="alinks">
+          <div class="alink">The Appeal Feb 2026</div>
+          <div class="alink">House lobbying disclosures</div>
+        </div>
+      </div>
+
+      <div class="acard">
+        <div class="aname">GEORGE ZOLEY</div>
+        <div class="arole">Founder & Exec. Chairman — GEO Group (NYSE: GEO)</div>
+        <div class="anotes">On 2025 earnings call: <em>"unprecedented growth opportunities."</em> $636.2M Q2 revenue. Secured 6,000 new ICE beds. <strong>$1M+ in political contributions</strong> including RNC and Trump PACs. Board of GEO loaded with revolving-door ICE/DOJ officials. 10 of 13 GEO lobbyists in 2024 previously held government positions. GEO carries $1.65B in total debt — refinanced revolving credit facility to $550M January 2026 with Citizens Bank.</div>
+        <div class="alinks">
+          <div class="alink">GEO Q2 2025 earnings call</div>
+          <div class="alink">OpenSecrets Apr 2025</div>
+        </div>
+      </div>
+
+      <div class="acard">
+        <div class="aname">REBECCA GOOD</div>
+        <div class="arole">Widow — Renée Good / Plaintiff in federal evidence lawsuit</div>
+        <div class="anotes">After the DOJ declined to investigate her wife's killing, federal investigators were dispatched to probe <strong>Rebecca Good</strong> to determine whether she may have "impeded a federal officer." In April 2026 she filed a motion in court ordering the federal government to hand over the SUV Renée was driving when shot — as key evidence. She is now a plaintiff in the ongoing Minnesota state lawsuit against DOJ and DHS for withholding evidence. The victim's widow became a federal investigation target.</div>
+        <div class="alinks">
+          <div class="alink">NBC News Jan 17 2026</div>
+          <div class="alink">Star Tribune May 2026</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ SECTION 7 — RESIGNATIONS ══════════════════════ -->
+<div class="sec" id="resignations" style="--i:6">
+  <div class="sec-hd" onclick="tog(this)">
+    <div class="sec-num">07</div>
+    <div class="sec-meta">
+      <div class="sec-cat">// The ones who walked out</div>
+      <div class="sec-title">THE RESIGNATIONS — WHO LEFT AND WHY</div>
+    </div>
+    <div class="sec-toggle">▼</div>
+  </div>
+  <div class="sec-body">
+    <div class="resign-track">
+
+      <div class="resign-row">
+        <div class="resign-who">Jim Felte<br><span style="font-size:0.5rem;color:var(--dim)">Chief — DOJ Civil Rights Criminal Section</span></div>
+        <div class="resign-why">Resigned January 13, 2026 after Dhillon blocked the Civil Rights Division from opening an investigation into Ross's killing of Good. Led the section that <strong>would ordinarily investigate federal officer shootings as a standard matter</strong>.</div>
+      </div>
+
+      <div class="resign-row">
+        <div class="resign-who">Principal Deputy Chief<br>Deputy Chief<br>Acting Deputy Chief<br><span style="font-size:0.5rem;color:var(--dim)">DOJ Civil Rights Criminal Section</span></div>
+        <div class="resign-why">All three resigned January 13, 2026 alongside Felte. The <strong>entire senior leadership</strong> of the Criminal Section — the office with decades of expertise investigating whether officers acted outside legal bounds — walked out simultaneously in protest of Dhillon's decision.</div>
+      </div>
+
+      <div class="resign-row">
+        <div class="resign-who">Joseph H. Thompson<br><span style="font-size:0.5rem;color:var(--dim)">First Asst. U.S. Attorney — District of Minnesota</span></div>
+        <div class="resign-why">Resigned after FBI Director Patel and senior DOJ officials told his office to stop pursuing the civil rights investigation. Had initiated the joint effort between the Minnesota Bureau of Criminal Apprehension and FBI. Resigned due to <strong>"the Justice Department's push to investigate the widow of [Renée Good] and the department's reluctance to investigate the shooter."</strong></div>
+      </div>
+
+      <div class="resign-row">
+        <div class="resign-who">13 Additional Prosecutors<br><span style="font-size:0.5rem;color:var(--dim)">U.S. Attorney's Office — District of Minnesota</span></div>
+        <div class="resign-why">Including the chiefs of the criminal division, civil division, and violent and major crimes unit. All resigned following Thompson. <strong>The office that would have prosecuted federal charges</strong> in the District of Minnesota effectively emptied out in protest.</div>
+      </div>
+
+      <div class="resign-row">
+        <div class="resign-who">Tracee Mergen<br><span style="font-size:0.5rem;color:var(--dim)">FBI Minneapolis Supervisor</span></div>
+        <div class="resign-why">Resigned January 23, 2026. FBI leadership — under Kash Patel — pushed her to abandon a civil rights inquiry into Ross. She refused. Leadership pushed harder. She resigned. The New York Times confirmed: <strong>Patel wanted warrants that would frame Good as the subject of investigation — not the victim.</strong></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ SECTION 8 — KAYFABE ══════════════════════ -->
+<div class="sec" id="kayfabe" style="--i:7">
+  <div class="sec-hd" onclick="tog(this)">
+    <div class="sec-num">08</div>
+    <div class="sec-meta">
+      <div class="sec-cat">// P.O.A.S.T. analytical framework</div>
+      <div class="sec-title">THE KAYFABE FRAME — HOW THE SYSTEM RUNS ITSELF</div>
+    </div>
+    <div class="sec-toggle">▼</div>
+  </div>
+  <div class="sec-body">
+
+    <div class="kb red">
+      <div class="kb-label">⬡ The Pipeline — Not a Conspiracy, a Design</div>
+      <div class="kb-text">Nobody in this chain needed to coordinate. The system is designed to produce this outcome. A nonprofit (CASA) staffed by a law firm alumnus (Dhillon Law Group / Schube) files a FOIA lawsuit. The VA billing collapses. Providers deny care. Detainees die in GEO Group and CoreCivic facilities — facilities posting <strong>record quarterly earnings</strong>. The law firm's principal (Dhillon) is now the nation's top civil rights officer and blocks investigation of a federal killing. The private prison executives attend inaugurations and donate to the PACs. The oversight committee chairman is a paid honoree of the companies he oversees. <span class="gold">Nobody conspired. The system runs itself.</span></div>
+    </div>
+
+    <div class="kb gold">
+      <div class="kb-label">⬡ The Bipartisan Capture — Red and Blue Both Cash the Check</div>
+      <div class="kb-text">GEO Group and CoreCivic pay Republican PACs. They also sit at the platinum tier of the Congressional Black Caucus Institute — the nonprofit that trains Black political leadership. Democratic Reps. Thompson and Cuellar are the top congressional recipients of private prison money. The same companies responsible for the majority of ICE detainee deaths have bought access to the room where their oversight is decided — on <strong>both sides of the aisle simultaneously</strong>. The partisan fight is the kayfabe. The revenue stream has no party.</div>
+    </div>
+
+    <div class="kb red">
+      <div class="kb-label">⬡ The Renée Good Inversion — Victim Becomes Suspect</div>
+      <div class="kb-text">This is the most telling move in the entire operation. When a federal agent kills a U.S. citizen on video, in a way that contradicts the government's account, the standard playbook is: investigate, adjudicate, account for. Instead: DHS tweets a conclusion <em>three hours</em> after the shooting. The DOJ declines civil rights review. The FBI is directed to frame the victim as the subject. Her widow is investigated. The Minnesota governor and mayor are threatened with prosecution. The entire senior leadership of the Criminal Section of the DOJ's Civil Rights Division — the office that exists specifically to investigate this — <strong>resigns en masse rather than comply.</strong> When the people whose job it is to investigate federal misconduct walk out rather than carry out the orders, that is the accountability signal. That is your receipt.</div>
+    </div>
+
+    <div class="kb gold">
+      <div class="kb-label">⬡ The Contractor Irony — By Design, Not Accident</div>
+      <div class="kb-text">A man whose prior company pleaded guilty to hiding undocumented workers from immigration authorities is now <span class="gold">building the largest ICE detention facility in U.S. history</span> and profiting from the detention of undocumented immigrants. He has donated $339,000 to Republican campaigns. He golfs with Eric Trump. He bought a $30 million house. His workers at the Afghan refugee contract went unpaid. Detainees at the facility he built died. He has never been charged with any crime related to any of this. The system does not punish this. The system <em>rewards</em> it.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-logo">Shhh.</div>
+  <div class="footer-r">
+    <div class="footer-line">@JimmyHitchcock — P.O.A.S.T.</div>
+    <div class="footer-line">YouTube · Rumble · Podcast</div>
+    <div class="footer-line">All findings sourced to primary documents,</div>
+    <div class="footer-line">court filings, FEC records & named reporting.</div>
+    <div class="footer-line gold" style="margin-top:0.4rem;">Less Noise. More Movement. The People Are The Power.</div>
+  </div>
+</footer>
+
+<script>
+function tog(hd) {
+  const body = hd.nextElementSibling;
+  const tog = hd.querySelector('.sec-toggle');
+  const open = body.classList.contains('open');
+  body.classList.toggle('open', !open);
+  hd.classList.toggle('open', !open);
+  tog.classList.toggle('open', !open);
+  tog.textContent = open ? '▼' : '▲';
+}
+
+// Smooth scroll + auto-open
+document.querySelectorAll('.cnav[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if (!target) return;
+    const body = target.querySelector('.sec-body');
+    const hd = target.querySelector('.sec-hd');
+    const toggle = target.querySelector('.sec-toggle');
+    body.classList.add('open');
+    hd.classList.add('open');
+    toggle.classList.add('open');
+    toggle.textContent = '▲';
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+});
+
+// Intersection observer for nav
+const secs = document.querySelectorAll('.sec[id]');
+const pills = document.querySelectorAll('.cnav');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = e.target.id;
+      pills.forEach(p => p.classList.toggle('active', p.getAttribute('href') === '#' + id));
+    }
+  });
+}, { threshold: 0.15 });
+secs.forEach(s => obs.observe(s));
+
+// Search
+function doSearch() {
+  const q = document.getElementById('si').value.toLowerCase();
+  const items = document.querySelectorAll('.finding, .acard, .tevent, .kb, .resign-row, .infra-row, .gfact, .qblock');
+  let vis = 0;
+  items.forEach(el => {
+    const match = !q || el.textContent.toLowerCase().includes(q);
+    el.style.display = match ? '' : 'none';
+    if (match) vis++;
+  });
+  const sc = document.getElementById('sc');
+  sc.textContent = q ? `${vis} result${vis !== 1 ? 's' : ''} for "${q}"` : 'All findings shown';
+  if (q) {
+    document.querySelectorAll('.sec').forEach(sec => {
+      const body = sec.querySelector('.sec-body');
+      const hd = sec.querySelector('.sec-hd');
+      const toggle = sec.querySelector('.sec-toggle');
+      const hasVis = [...sec.querySelectorAll('.finding,.acard,.tevent,.kb,.resign-row,.infra-row,.gfact,.qblock')].some(f => f.style.display !== 'none');
+      if (hasVis) {
+        body.classList.add('open');
+        hd.classList.add('open');
+        toggle.classList.add('open');
+        toggle.textContent = '▲';
+      }
+    });
+  }
+}
+</script>
+</body>
+</html>
