@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ============================================================= -->
+<!-- ==  FACEBOOK / OPEN GRAPH  —  EDIT THE 3 LINES MARKED ⚠      == -->
+<!-- ==  1. Set og:url + canonical to this page's real address    == -->
+<!-- ==  2. Make a 1200x630 image, host it, put its URL in og:image== -->
+<!-- ==     (fastest: screenshot the hero, crop to 1200x630)       == -->
+<!-- ============================================================= -->
+<title>Two "Baby Bonds." One Became Law. — P.O.A.S.T.</title>
+<meta name="description" content="Same $1,000 seed. Opposite result. How the baby bonds bill that fills a poor kid's account never passed — and the version that rewards families already ahead became law as 'Trump Accounts.'">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="P.O.A.S.T.">
+<meta property="og:title" content="Two &quot;Baby Bonds.&quot; One Became Law.">
+<meta property="og:description" content="Same $1,000 seed. Opposite result. The wealth-scaled baby bond never passed; the flat version that favors families already ahead became law. The White House's own numbers prove it.">
+<meta property="og:url" content="https://jimmyhitchcock3731-coder.github.io/baby-bonds-vs-trump-accounts.html"> <!-- ⚠ set real URL -->
+<meta property="og:image" content="https://jimmyhitchcock3731-coder.github.io/baby-bonds-og.png"> <!-- ⚠ 1200x630 image URL -->
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Two account statements: same $1,000 government seed, ending balances of $5,800 and $303,800.">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Two &quot;Baby Bonds.&quot; One Became Law.">
+<meta name="twitter:description" content="Same $1,000 seed. Opposite result. The White House's own numbers prove it.">
+<meta name="twitter:image" content="https://jimmyhitchcock3731-coder.github.io/baby-bonds-og.png"> <!-- ⚠ same image URL -->
+
+<link rel="canonical" href="https://jimmyhitchcock3731-coder.github.io/baby-bonds-vs-trump-accounts.html"> <!-- ⚠ set real URL -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#101419; --surface:#171C23; --surface-2:#1E252E; --line:#2B333D;
+    --text:#E9E7E1; --muted:#98A2AE; --faint:#6B7480;
+    --bond:#37B183;        /* living green — the bond that grows */
+    --bond-dim:#1c3b31;
+    --gold:#D3A63F;        /* gilded gold — Trump Accounts */
+    --gold-dim:#3a2f13;
+    --seed:#7FA6C9;        /* steel — the identical $1,000 */
+    --alert:#E0533D;       /* burnt red — the removed feature / the gap */
+    --display:'Archivo',system-ui,sans-serif;
+    --body:'Newsreader',Georgia,serif;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:var(--body); font-size:19px; line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px; margin:0 auto; padding:0 22px}
+  .eyebrow{
+    font-family:var(--mono); font-size:12.5px; letter-spacing:.22em;
+    text-transform:uppercase; color:var(--muted); font-weight:500;
+  }
+  h1,h2,h3{font-family:var(--display); font-weight:900; line-height:1.02; letter-spacing:-.02em; margin:0}
+  a{color:var(--seed)}
+
+  /* ---- top bar ---- */
+  .topbar{
+    position:sticky; top:0; z-index:50; background:rgba(16,20,25,.86);
+    backdrop-filter:blur(10px); border-bottom:1px solid var(--line);
+  }
+  .topbar .wrap{display:flex; align-items:center; justify-content:space-between; height:56px}
+  .brand{font-family:var(--display); font-weight:900; letter-spacing:.02em; font-size:16px}
+  .brand b{color:var(--bond)}
+  .topbar .tag{font-family:var(--mono); font-size:11px; letter-spacing:.16em; color:var(--muted); text-transform:uppercase}
+
+  /* ---- hero ---- */
+  .hero{padding:64px 0 26px; border-bottom:1px solid var(--line)}
+  .hero h1{font-size:clamp(38px,7vw,74px); margin:16px 0 0}
+  .hero h1 .grow{color:var(--bond)}
+  .hero h1 .gilt{color:var(--gold)}
+  .lede{font-size:clamp(19px,2.4vw,23px); color:var(--muted); max-width:46ch; margin:22px 0 0}
+  .lede b{color:var(--text); font-weight:500}
+
+  /* ---- statement stubs (the signature) ---- */
+  .stubs{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:42px 0 8px}
+  @media(max-width:620px){.stubs{grid-template-columns:1fr}}
+  .stub{
+    background:var(--surface); border:1px solid var(--line); border-radius:10px;
+    padding:20px 20px 22px; font-family:var(--mono); position:relative; overflow:hidden;
+  }
+  .stub.kidA{border-top:3px solid var(--faint)}
+  .stub.kidB{border-top:3px solid var(--gold)}
+  .stub .who{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted)}
+  .stub .title{font-size:13px; color:var(--faint); margin:2px 0 16px; letter-spacing:.02em}
+  .ledger{font-size:14px}
+  .ledger .row{display:flex; justify-content:space-between; gap:10px; padding:6px 0; color:var(--muted)}
+  .ledger .row .dots{flex:1; border-bottom:1px dotted #3b434e; transform:translateY(-4px); margin:0 4px}
+  .ledger .row.seed{color:var(--seed)}
+  .ledger .row.seed .amt{color:var(--seed); font-weight:600}
+  .ledger .amt{color:var(--text); font-variant-numeric:tabular-nums; white-space:nowrap}
+  .ledger .rule{height:1px; background:var(--line); margin:12px 0 10px}
+  .ledger .bal{display:flex; justify-content:space-between; align-items:baseline; gap:10px}
+  .ledger .bal .lbl{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted)}
+  .ledger .bal .big{font-family:var(--display); font-weight:900; font-size:clamp(30px,6vw,42px); letter-spacing:-.02em}
+  .kidA .big{color:var(--text)}
+  .kidB .big{color:var(--gold)}
+  .seedtag{
+    display:inline-block; margin-top:14px; font-family:var(--mono); font-size:11px;
+    color:var(--seed); border:1px solid #2f4557; background:#14202b; border-radius:999px; padding:3px 10px; letter-spacing:.04em;
+  }
+  .verdict{
+    margin:22px 0 6px; font-family:var(--body); font-size:clamp(19px,2.5vw,24px); line-height:1.5; max-width:62ch;
+  }
+  .verdict b{color:var(--text); font-weight:600}
+  .verdict .red{color:var(--alert); font-weight:600}
+  .srcnote{font-family:var(--mono); font-size:12px; color:var(--faint); margin-top:10px; letter-spacing:.01em}
+
+  /* ---- section frame ---- */
+  section{padding:56px 0; border-bottom:1px solid var(--line)}
+  .sec-head{display:flex; align-items:baseline; gap:14px; margin-bottom:28px; flex-wrap:wrap}
+  .sec-head h2{font-size:clamp(26px,4vw,40px)}
+  .sec-head .num{font-family:var(--mono); color:var(--faint); font-size:14px; letter-spacing:.1em}
+
+  /* ---- comparison grid ---- */
+  .cmp-legend{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:6px}
+  .chip{font-family:var(--display); font-weight:800; font-size:15px; padding:12px 14px; border-radius:8px; line-height:1.2}
+  .chip small{display:block; font-family:var(--mono); font-weight:400; font-size:11px; letter-spacing:.08em; text-transform:uppercase; margin-top:4px; opacity:.8}
+  .chip.b{background:var(--bond-dim); color:var(--bond); border:1px solid #2c5647}
+  .chip.g{background:var(--gold-dim); color:var(--gold); border:1px solid #5a4a1f}
+  .crow{border-top:1px solid var(--line); padding:16px 0 4px}
+  .crow .feat{font-family:var(--mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); margin-bottom:10px}
+  .crow .cells{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+  .cell{font-size:16.5px; line-height:1.45}
+  .cell.b{color:var(--text)}
+  .cell.g{color:var(--text)}
+  .cell .k{font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; display:block; margin-bottom:3px}
+  .cell.b .k{color:var(--bond)}
+  .cell.g .k{color:var(--gold)}
+  .cell.win{font-weight:500}
+  .cell em{font-style:normal; color:var(--alert); font-weight:600}
+
+  /* ---- the removed feature callout ---- */
+  .removed{background:linear-gradient(180deg,#1c1416,#171C23); border:1px solid #4a2a24; border-radius:12px; padding:30px 26px}
+  .removed .eyebrow{color:var(--alert)}
+  .removed h2{font-size:clamp(24px,4vw,36px); margin:12px 0 14px; color:var(--text)}
+  .removed h2 .x{color:var(--alert)}
+  .removed p{margin:0; color:var(--muted); max-width:64ch}
+  .removed p b{color:var(--text); font-weight:500}
+
+  /* ---- fair case ---- */
+  .twoup{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+  @media(max-width:720px){.twoup{grid-template-columns:1fr}}
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:24px}
+  .card h3{font-size:19px; margin-bottom:12px; letter-spacing:.01em}
+  .card.for h3{color:var(--muted)}
+  .card.against h3{color:var(--text)}
+  .card ul{margin:0; padding-left:0; list-style:none}
+  .card li{position:relative; padding-left:20px; margin:10px 0; font-size:16.5px; color:var(--muted); line-height:1.5}
+  .card li::before{content:""; position:absolute; left:0; top:11px; width:7px; height:7px; border-radius:2px}
+  .card.for li::before{background:var(--faint)}
+  .card.against li::before{background:var(--alert)}
+  .card.against li{color:var(--text)}
+
+  /* ---- sources ---- */
+  .sources{font-family:var(--mono); font-size:13px; color:var(--muted); line-height:1.8}
+  .sources li{margin:0}
+  .sources ul{padding-left:18px}
+
+  /* ---- footer ---- */
+  footer{padding:48px 0 60px; text-align:center}
+  footer .motto{font-family:var(--display); font-weight:800; font-size:clamp(20px,3.4vw,30px); letter-spacing:-.01em}
+  footer .motto b{color:var(--bond)}
+  footer .cta{display:inline-block; margin-top:22px; font-family:var(--mono); font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:var(--bg); background:var(--bond); padding:13px 22px; border-radius:8px; text-decoration:none; font-weight:600}
+  footer .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:26px; letter-spacing:.04em}
+
+  /* reveal */
+  .reveal{opacity:0; transform:translateY(14px); transition:opacity .6s ease, transform .6s ease}
+  .reveal.in{opacity:1; transform:none}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1; transform:none; transition:none}}
+  :focus-visible{outline:2px solid var(--seed); outline-offset:3px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <span class="brand">P.<b>O</b>.A.S.T.</span>
+    <span class="tag">The Jar &amp; The Gap</span>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Two bills · one idea · one $1,000 seed</p>
+    <h1>Same seed.<br><span class="grow">One fills the jar.</span><br><span class="gilt">One tips it to the top.</span></h1>
+    <p class="lede">Both bills hand a newborn a <b>$1,000 government seed</b>. One was written so the government keeps filling the poorest child's account. The other stops at $1,000 and lets families who already have money pour in the rest. <b>One never passed. One is law.</b></p>
+
+    <!-- SIGNATURE: two account statements -->
+    <div class="stubs reveal">
+      <div class="stub kidA">
+        <div class="who">Trump Account · Statement</div>
+        <div class="title">Child A — family contributes nothing</div>
+        <div class="ledger">
+          <div class="row seed"><span>Gov't seed</span><span class="dots"></span><span class="amt">$1,000</span></div>
+          <div class="row"><span>Family deposits</span><span class="dots"></span><span class="amt">$0</span></div>
+          <div class="row"><span>Market growth</span><span class="dots"></span><span class="amt">~$4,800</span></div>
+          <div class="rule"></div>
+          <div class="bal"><span class="lbl">Balance at 18</span><span class="big">$5,800</span></div>
+        </div>
+        <span class="seedtag">◆ Gov't put in $1,000</span>
+      </div>
+
+      <div class="stub kidB">
+        <div class="who">Trump Account · Statement</div>
+        <div class="title">Child B — family maxes out every year</div>
+        <div class="ledger">
+          <div class="row seed"><span>Gov't seed</span><span class="dots"></span><span class="amt">$1,000</span></div>
+          <div class="row"><span>Family deposits</span><span class="dots"></span><span class="amt">$90,000</span></div>
+          <div class="row"><span>Market growth</span><span class="dots"></span><span class="amt">~$212,800</span></div>
+          <div class="rule"></div>
+          <div class="bal"><span class="lbl">Balance at 18</span><span class="big">$303,800</span></div>
+        </div>
+        <span class="seedtag">◆ Gov't put in $1,000</span>
+      </div>
+    </div>
+
+    <p class="verdict reveal">The government did the <b>exact same thing</b> for both children — one $1,000 deposit. The <span class="red">$298,000 difference</span> is entirely family money the first child's household never had. That's not a program that closes the gap. <b>By design, it widens it.</b></p>
+    <p class="srcnote">Figures: White House Council of Economic Advisers, Aug. 2025, medium market-return scenario.</p>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="num">01</span>
+      <h2>The same idea, side by side</h2>
+    </div>
+
+    <div class="cmp-legend">
+      <div class="chip b">Baby Bonds <small>Booker &amp; Pressley · never passed</small></div>
+      <div class="chip g">Trump Accounts <small>Signed into law · July 4, 2025</small></div>
+    </div>
+
+    <div class="crow reveal">
+      <div class="feat">Seed at birth</div>
+      <div class="cells">
+        <div class="cell b"><span class="k">Baby Bonds</span>$1,000</div>
+        <div class="cell g"><span class="k">Trump Accounts</span>$1,000</div>
+      </div>
+    </div>
+
+    <div class="crow reveal">
+      <div class="feat">Recurring government money</div>
+      <div class="cells">
+        <div class="cell b win"><span class="k">Baby Bonds</span>Up to <b>$2,000 every year</b> until 18</div>
+        <div class="cell g"><span class="k">Trump Accounts</span><em>None.</em> One $1,000, then nothing</div>
+      </div>
+    </div>
+
+    <div class="crow reveal">
+      <div class="feat">Who gets the most</div>
+      <div class="cells">
+        <div class="cell b win"><span class="k">Baby Bonds</span>Scaled by wealth — <b>poorest kids get the biggest deposits</b></div>
+        <div class="cell g"><span class="k">Trump Accounts</span><em>Flat.</em> Same $1,000 to every child, rich or poor</div>
+      </div>
+    </div>
+
+    <div class="crow reveal">
+      <div class="feat">Who adds money after the seed</div>
+      <div class="cells">
+        <div class="cell b"><span class="k">Baby Bonds</span>The government</div>
+        <div class="cell g"><span class="k">Trump Accounts</span>Families, up to $5,000/yr — <em>no match</em></div>
+      </div>
+    </div>
+
+    <div class="crow reveal">
+      <div class="feat">Where the money sits</div>
+      <div class="cells">
+        <div class="cell b"><span class="k">Baby Bonds</span>Treasury, insured, ~3% <b>guaranteed</b></div>
+        <div class="cell g"><span class="k">Trump Accounts</span>Stock market (S&amp;P 500) — can be down at 18</div>
+      </div>
+    </div>
+
+    <div class="crow reveal">
+      <div class="feat">How you get it</div>
+      <div class="cells">
+        <div class="cell b win"><span class="k">Baby Bonds</span><b>Automatic at birth</b></div>
+        <div class="cell g"><span class="k">Trump Accounts</span>File a tax form; only if you claim the child as a dependent</div>
+      </div>
+    </div>
+
+    <div class="crow reveal">
+      <div class="feat">What it is at 18</div>
+      <div class="cells">
+        <div class="cell b"><span class="k">Baby Bonds</span>A stake for a <b>home, college, or business</b></div>
+        <div class="cell g"><span class="k">Trump Accounts</span>A retirement IRA — 10% penalty to touch it early</div>
+      </div>
+    </div>
+
+    <div class="crow reveal">
+      <div class="feat">Paid for by</div>
+      <div class="cells">
+        <div class="cell b"><span class="k">Baby Bonds</span>Taxing inherited fortunes (estate tax)</div>
+        <div class="cell g"><span class="k">Trump Accounts</span>Inside a tax package tilted to the top</div>
+      </div>
+    </div>
+
+    <div class="crow reveal">
+      <div class="feat">Whose name is on it</div>
+      <div class="cells">
+        <div class="cell b"><span class="k">Baby Bonds</span>Two Black legislators — carried it 7 years</div>
+        <div class="cell g"><span class="k">Trump Accounts</span>The President — 4 million accounts in year one</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="removed reveal">
+      <p class="eyebrow">The one feature they removed</p>
+      <h2>They kept the $1,000. They cut the part that <span class="x">did the work.</span></h2>
+      <p>The whole point of a baby bond was one design choice: <b>the government keeps depositing, and it deposits the most for the children with the least.</b> That inverse-to-wealth scaling is what fills an empty account by age 18. Strip it out — keep only the flat $1,000 photo-op — and you're left with an account that grows fastest for the families who were already ahead. Same name. Same seed. Opposite effect.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="num">02</span>
+      <h2>The honest scorecard</h2>
+    </div>
+    <div class="twoup">
+      <div class="card for reveal">
+        <h3>The case made for Trump Accounts</h3>
+        <ul>
+          <li>Universal — every child qualifies, no means-testing, no stigma.</li>
+          <li>Builds a saving and investing habit from birth.</li>
+          <li>Stock-market returns can beat a 3% Treasury account over 18 years.</li>
+          <li>The first federal child-savings accounts ever — a precedent to build on.</li>
+        </ul>
+      </div>
+      <div class="card against reveal">
+        <h3>What the design actually does</h3>
+        <ul>
+          <li>Grows with private deposits — so it rewards families with money to spare.</li>
+          <li>Seed-only floor is about $5,800 at 18 (the government's own number).</li>
+          <li>The tax-form claim adds exactly the friction that filters out the poorest.</li>
+          <li>Turning into a penalty-bound IRA means it isn't an at-18 down payment.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="verdict reveal" style="margin-top:26px">It isn't that a $1,000 head start is bad. It's that they took the one idea that could have filled the empty jar, kept the seed, and <b>left the teeth on the cutting-room floor.</b></p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head"><span class="num">03</span><h2>Receipts</h2></div>
+    <div class="sources">
+      <ul>
+        <li>Public Law 119-21 (One Big Beautiful Bill Act), §70204 — establishes Trump Accounts.</li>
+        <li>IRS Notice 2025-68 &amp; Treasury guidance — $1,000 pilot seed, 2025–2028 birth window, $5,000 annual cap, S&amp;P 500 requirement, Form 4547 election.</li>
+        <li>White House Council of Economic Advisers, Aug. 2025 — the $5,800 vs. $303,800 age-18 figures.</li>
+        <li>American Opportunity Accounts Act — Sen. Booker &amp; Rep. Pressley; introduced 2018, 2019, 2021, 2023; $1,000 seed + up to $2,000/yr scaled to income, ~3% Treasury, estate-tax funded.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p class="motto">Less Noise. More Movement.<br><b>The People Are The Power.</b></p>
+    <a class="cta" href="https://poast37.substack.com" target="_blank" rel="noopener">Read the full investigation →</a>
+    <p class="fine">P.O.A.S.T. — independent investigative journalism · verify every figure at the sources above</p>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var els=document.querySelectorAll('.reveal');
+    if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in')});return;}
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){ if(en.isIntersecting){en.target.classList.add('in'); io.unobserve(en.target);} });
+    },{threshold:.12});
+    els.forEach(function(e){io.observe(e)});
+  })();
+</script>
+</body>
+</html>
