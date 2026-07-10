@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ============================================================= -->
+<!-- ==  FACEBOOK / OPEN GRAPH  —  EDIT THE 2 LINES MARKED ⚠      == -->
+<!-- ==  (og:url + canonical already match this filename)          == -->
+<!-- ============================================================= -->
+<title>The Two Jars — P.O.A.S.T.</title>
+<meta name="description" content="Fifty years of Black faces in Congress, explained so anyone can follow it: representation is not power. A face is not a force. And the jar is still at fifteen.">
+
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="P.O.A.S.T.">
+<meta property="og:title" content="The Two Jars">
+<meta property="og:description" content="Representation is not power. A face is not a force. Fifty years of faces — and the jar is still at fifteen. Explained so anyone can follow it.">
+<meta property="og:url" content="https://jimmyhitchcock3731-coder.github.io/two-jars.html"> <!-- ⚠ set real URL if filename differs -->
+<meta property="og:image" content="https://jimmyhitchcock3731-coder.github.io/two-jars-og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Two jars: one full of marbles at 100, one nearly empty at 15 — the racial wealth gap.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The Two Jars">
+<meta name="twitter:description" content="A face is not a force. Fifty years of faces — and the jar is still at fifteen.">
+<meta name="twitter:image" content="https://jimmyhitchcock3731-coder.github.io/two-jars-og.png">
+<link rel="canonical" href="https://jimmyhitchcock3731-coder.github.io/two-jars.html"> <!-- ⚠ set real URL if filename differs -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#101419; --surface:#171C23; --surface-2:#1E252E; --line:#2B333D;
+    --text:#E9E7E1; --muted:#98A2AE; --faint:#6B7480;
+    --bond:#37B183; --bond-dim:#1c3b31;
+    --gold:#D3A63F; --gold-dim:#3a2f13;
+    --seed:#7FA6C9; --alert:#E0533D; --alert-dim:#3a201c;
+    --display:'Archivo',system-ui,sans-serif;
+    --body:'Newsreader',Georgia,serif;
+    --mono:'IBM Plex Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0; background:var(--bg); color:var(--text); font-family:var(--body); font-size:20px; line-height:1.65; -webkit-font-smoothing:antialiased}
+  .wrap{max-width:720px; margin:0 auto; padding:0 24px}
+  .eyebrow{font-family:var(--mono); font-size:12.5px; letter-spacing:.22em; text-transform:uppercase; color:var(--muted); font-weight:500}
+  h1,h2,h3{font-family:var(--display); font-weight:900; line-height:1.05; letter-spacing:-.02em; margin:0}
+  a{color:var(--seed)}
+  p{margin:0 0 20px}
+  strong{color:var(--text); font-weight:600}
+
+  .topbar{position:sticky; top:0; z-index:50; background:rgba(16,20,25,.86); backdrop-filter:blur(10px); border-bottom:1px solid var(--line)}
+  .topbar .wrap{display:flex; align-items:center; justify-content:space-between; height:56px; max-width:720px}
+  .brand{font-family:var(--display); font-weight:900; letter-spacing:.02em; font-size:16px}
+  .brand b{color:var(--bond)}
+  .topbar .tag{font-family:var(--mono); font-size:11px; letter-spacing:.16em; color:var(--muted); text-transform:uppercase}
+
+  .hero{padding:60px 0 36px; border-bottom:1px solid var(--line)}
+  .hero h1{font-size:clamp(40px,8vw,72px)}
+  .hero .sub{font-size:clamp(19px,2.4vw,23px); color:var(--muted); margin-top:18px; font-style:italic}
+
+  .body-sec{padding:44px 0}
+  .body-sec p:first-child{margin-top:0}
+  .lead{font-size:clamp(21px,2.6vw,25px); line-height:1.5}
+  h2.step{font-size:clamp(22px,3.4vw,30px); margin:40px 0 14px; color:var(--text)}
+  h2.step .accent{color:var(--gold)}
+
+  .jarline{color:var(--alert); font-weight:600}
+  .greenline{color:var(--bond); font-weight:600}
+
+  .pull{border-left:3px solid var(--gold); padding:6px 0 6px 22px; margin:34px 0; font-size:clamp(22px,3.2vw,28px); font-family:var(--display); font-weight:800; line-height:1.2; color:var(--text)}
+  .pull .g{color:var(--gold)}
+
+  /* receipts table */
+  .receipts{margin:8px 0 0; border-top:1px solid var(--line)}
+  .rrow{display:grid; grid-template-columns:1fr 1.3fr; gap:16px; padding:15px 0; border-bottom:1px solid var(--line)}
+  @media(max-width:560px){.rrow{grid-template-columns:1fr; gap:4px}}
+  .rrow .kid{font-family:var(--body); font-size:17px; color:var(--text); font-style:italic}
+  .rrow .fact{font-family:var(--mono); font-size:13.5px; color:var(--muted); line-height:1.5}
+  .rlabel{font-family:var(--mono); font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin:0 0 6px}
+
+  .links{display:grid; gap:12px; margin-top:14px}
+  .linkcard{display:block; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:16px 18px; text-decoration:none; transition:border-color .2s}
+  .linkcard:hover{border-color:var(--seed)}
+  .linkcard .t{font-family:var(--display); font-weight:800; font-size:17px; color:var(--text)}
+  .linkcard .u{font-family:var(--mono); font-size:12px; color:var(--seed); margin-top:4px}
+
+  footer{padding:44px 0 60px; text-align:center; border-top:1px solid var(--line)}
+  footer .motto{font-family:var(--display); font-weight:800; font-size:clamp(20px,3.4vw,28px)}
+  footer .motto b{color:var(--bond)}
+  footer .cta{display:inline-block; margin-top:22px; font-family:var(--mono); font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:var(--bg); background:var(--bond); padding:13px 22px; border-radius:8px; text-decoration:none; font-weight:600}
+  footer .fine{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin-top:24px}
+
+  .reveal{opacity:0; transform:translateY(14px); transition:opacity .6s ease, transform .6s ease}
+  .reveal.in{opacity:1; transform:none}
+  @media(prefers-reduced-motion:reduce){.reveal{opacity:1; transform:none; transition:none}}
+  :focus-visible{outline:2px solid var(--seed); outline-offset:3px}
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="wrap">
+  <span class="brand">P.<b>O</b>.A.S.T.</span>
+  <span class="tag">The Jar &amp; The Gap</span>
+</div></div>
+
+<header class="hero"><div class="wrap">
+  <p class="eyebrow">Explained so anyone can follow it</p>
+  <h1>The Two Jars</h1>
+  <p class="sub">Representation is not power. A face is not a force. And the jar is still at fifteen.</p>
+</div></header>
+
+<section class="body-sec"><div class="wrap">
+  <p class="lead">Imagine a classroom with <strong>100 kids</strong>. To change any rule, you need 51 hands up. That's the deal.</p>
+
+  <p>About <strong>13 of those kids</strong> are a special group. Call them the Helpers. Their job is to stand up for the kids who've been treated unfairly for a long, long time.</p>
+
+  <p>For <strong>50 years</strong>, the Helpers have stood up every single day. Speeches. Hands up. Real work. That part is true — they are not lazy and they are not fake.</p>
+
+  <p>But here's what even a five-year-old can see. On the teacher's desk there are <strong>two jars of marbles</strong>. One jar — the kids who were always treated fair — has <strong>100 marbles</strong>. The other jar — the kids the Helpers stand up for — has <strong>15</strong>.</p>
+
+  <p>For 50 years the Helpers gave speeches about those jars. They got a holiday named. They got a museum built. They even won a few real rules — good ones, like <em>"you can stay home when your baby is born."</em></p>
+
+  <p>Then go look at the jar. <span class="jarline">It still has about 15 marbles.</span></p>
+
+  <p>That's the whole secret. The speeches were loud. <strong>The jar didn't fill.</strong></p>
+
+  <h2 class="step">Why didn't it fill?</h2>
+
+  <p><strong>One — they were always outnumbered.</strong> 13 hands can't beat 51. To fill the jar, the Helpers had to <em>ask the other kids</em> — the same kids whose jar was already full. On the big stuff, those kids almost always said no. So the Helpers learned to ask for things they <em>could</em> win: a holiday, a museum, a day off. Easier to get. Doesn't fill the jar.</p>
+
+  <p><strong>Two — some Helpers started liking the front of the room.</strong> Up front you get the cameras and the nice chair. After a while, a few of them cared more about keeping the nice chair than filling the jar. Not all of them. But enough to notice.</p>
+
+  <h2 class="step">The biggest thing that <span class="accent">never happened</span></h2>
+
+  <p>One kid stood up <strong>every single year for 35 years</strong> and said: <em>"Can we PLEASE just talk about why one jar has 100 and the other has 15?"</em> Just talk. Thirty-five years. The answer was always "not today." They never even had the conversation.</p>
+
+  <h2 class="step">The jar you can't see</h2>
+
+  <p>There's one more jar. The <strong>timeout chair</strong>. The kids the Helpers stand up for get sent to timeout about <strong>5 times more often</strong>. And 30 years ago, a bunch of the Helpers voted to <em>build more timeout chairs</em>, because they thought it would keep the class safe. Some said no. Most said yes. The chairs got built. They're still full.</p>
+
+  <div class="pull reveal">Having somebody who <span class="g">looks like you</span> stand up front is not the same as filling your jar. That's the difference between a <span class="g">face</span> and a <span class="g">force</span>.</div>
+
+  <p>For 50 years we got a lot of faces. The jar is still at 15. That's not <em>nothing</em>. But don't let anybody tell you it's <em>a lot</em>.</p>
+
+  <p class="jarline" style="font-size:26px; font-family:var(--display); font-weight:800;">Look at the jar.</p>
+</div></section>
+
+<section class="body-sec" style="border-top:1px solid var(--line)"><div class="wrap">
+  <p class="rlabel">The receipts — so it's not just a story</p>
+  <div class="receipts">
+    <div class="rrow"><div class="kid">15 marbles for every 100</div><div class="fact">For every $100 in white family wealth, Black families hold ~$15 — barely moved since the 1980s. <span style="color:var(--faint)">Federal Reserve, Survey of Consumer Finances</span></div></div>
+    <div class="rrow"><div class="kid">13 of 100 kids</div><div class="fact">The CBC at its peak ≈ 60 of 435 House seats (~14%) — can't pass anything without the majority. <span style="color:var(--faint)">U.S. House composition</span></div></div>
+    <div class="rrow"><div class="kid">35 years, no conversation</div><div class="fact">H.R. 40 — a bill just to <em>study</em> reparations — introduced every Congress since 1989; never a floor vote. <span style="color:var(--faint)">Congress.gov</span></div></div>
+    <div class="rrow"><div class="kid">Timeout chair, 5×</div><div class="fact">Black Americans imprisoned at roughly 5× the white rate. <span style="color:var(--faint)">The Sentencing Project</span></div></div>
+    <div class="rrow"><div class="kid">Voted to build more chairs</div><div class="fact">1994 crime bill — two-thirds of Black House members voted yes. <span style="color:var(--faint)">U.S. House Roll Call 416</span></div></div>
+  </div>
+
+  <p class="rlabel" style="margin-top:34px">Go deeper</p>
+  <div class="links">
+    <a class="linkcard" href="https://jimmyhitchcock3731-coder.github.io/cbc-since-1971.html">
+      <div class="t">Whose Name Is On The Law? — the full CBC breakdown</div>
+      <div class="u">jimmyhitchcock3731-coder.github.io/cbc-since-1971.html</div>
+    </a>
+    <a class="linkcard" href="https://jimmyhitchcock3731-coder.github.io/baby-bonds-vs-trump-accounts.html">
+      <div class="t">Two "Baby Bonds" — one became law. The side-by-side.</div>
+      <div class="u">jimmyhitchcock3731-coder.github.io/baby-bonds-vs-trump-accounts.html</div>
+    </a>
+  </div>
+</div></section>
+
+<footer><div class="wrap">
+  <p class="motto">Less Noise. More Movement.<br><b>The People Are The Power.</b></p>
+  <a class="cta" href="https://poast37.substack.com" target="_blank" rel="noopener">Read the full investigation →</a>
+  <p class="fine">P.O.A.S.T. — independent investigative journalism</p>
+</div></footer>
+
+<script>
+  (function(){
+    var els=document.querySelectorAll('.reveal');
+    if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in')});return;}
+    var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');io.unobserve(x.target);}})},{threshold:.1});
+    els.forEach(function(e){io.observe(e)});
+  })();
+</script>
+</body>
+</html>
